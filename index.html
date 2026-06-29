@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+<title>Dozzaa — Ad Management Platform</title>
+<meta name="description" content="Manage Meta, TikTok, Google & X ad campaigns in Naira, with Nigerian geo-targeting and Pidgin/Yoruba/Igbo/Hausa AI ad copy." />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#070b14" />
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="icon" href="icons/favicon-16.png" sizes="16x16" type="image/png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Dozzaa" />
+<meta name="mobile-web-app-capable" content="yes" />
+
+<style>
+:root{
+  --navy-950:#070b14;
+  --navy-900:#0a0f1d;
+  --navy-850:#0d1426;
+  --navy-800:#101a2f;
+  --navy-700:#16223d;
+  --navy-600:#1c2c4d;
+  --navy-500:#27406b;
+  --cyan-400:#39c5f4;
+  --cyan-300:#5ed4f7;
+  --cyan-500:#1aa8de;
+  --cyan-glow:rgba(57,197,244,0.35);
+  --ink-50:#f3f7fb;
+  --ink-200:#c8d6e8;
+  --ink-400:#8ba0bf;
+  --ink-500:#6c7f9c;
+  --ink-600:#56657d;
+  --ink-700:#3d4a60;
+  --emerald:#22c97e;
+  --amber:#f5a623;
+  --red:#f0556b;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-sm:8px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--navy-950);
+  color:var(--ink-50);
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+#app{min-height:100vh;display:flex;flex-direction:column;}
+button,input,select,textarea{font-family:inherit;}
+button{cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--navy-900);}
+::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan-500);}
+.glass{background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.07);}
+.skeleton{background:linear-gradient(90deg,var(--navy-800) 25%,var(--navy-700) 50%,var(--navy-800) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.gradient-text{background:linear-gradient(135deg,var(--cyan-300),var(--cyan-400),#7dd8f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.glow-btn{background:linear-gradient(135deg,var(--cyan-500),var(--cyan-400));color:var(--navy-950);border:none;font-weight:700;box-shadow:0 4px 20px var(--cyan-glow);transition:transform .15s ease, box-shadow .15s ease;}
+.glow-btn:hover{transform:translateY(-1px);box-shadow:0 6px 26px var(--cyan-glow);}
+.glow-btn:active{transform:translateY(0);}
+.glow-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.ghost-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--ink-400);font-weight:500;transition:all .15s ease;}
+.ghost-btn:hover{color:var(--ink-50);border-color:rgba(255,255,255,0.2);}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select,textarea{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius-sm);
+  color:var(--ink-50);padding:10px 14px;font-size:14px;outline:none;width:100%;transition:border-color .15s ease;color-scheme:dark;
+}
+input::placeholder,textarea::placeholder{color:var(--ink-600);}
+input:focus,select:focus,textarea:focus{border-color:rgba(57,197,244,0.5);}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid transparent;}
+.badge-meta{background:rgba(24,119,242,0.12);color:#5b9bf5;border-color:rgba(24,119,242,0.25);}
+.badge-google{background:rgba(234,67,53,0.12);color:#f08077;border-color:rgba(234,67,53,0.25);}
+.badge-tiktok{background:rgba(154,163,178,0.12);color:#c4cad6;border-color:rgba(154,163,178,0.25);}
+.badge-twitter{background:rgba(59,196,242,0.12);color:#7fd6f8;border-color:rgba(59,196,242,0.25);}
+.status-live{background:rgba(34,201,126,0.12);color:var(--emerald);border-color:rgba(34,201,126,0.25);}
+.status-paused{background:rgba(245,166,35,0.12);color:var(--amber);border-color:rgba(245,166,35,0.25);}
+.status-draft{background:rgba(140,150,165,0.12);color:var(--ink-400);border-color:rgba(140,150,165,0.25);}
+.status-completed{background:rgba(57,197,244,0.12);color:var(--cyan-400);border-color:rgba(57,197,244,0.25);}
+.switch{position:relative;width:42px;height:24px;border-radius:999px;border:none;background:var(--navy-700);transition:background .2s;flex-shrink:0;}
+.switch.on{background:var(--cyan-500);}
+.switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+.switch.on .knob{transform:translateX(18px);}
+.app-shell{display:flex;min-height:100vh;width:100%;}
+.sidebar{position:fixed;top:0;left:0;height:100%;width:248px;z-index:30;background:var(--navy-900);border-right:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;transition:transform .25s ease;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:25;display:none;}
+.sidebar-overlay.show{display:block;}
+.main-area{flex:1;display:flex;flex-direction:column;min-height:100vh;margin-left:248px;min-width:0;}
+@media (max-width: 900px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main-area{margin-left:0;}
+}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;font-size:13.5px;font-weight:500;color:var(--ink-400);transition:all .15s ease;margin:0 8px;cursor:pointer;border:none;background:none;width:calc(100% - 16px);text-align:left;}
+.nav-item:hover{color:var(--ink-50);background:rgba(255,255,255,0.04);}
+.nav-item.active{color:var(--cyan-300);background:rgba(57,197,244,0.1);}
+.nav-item svg{flex-shrink:0;width:18px;height:18px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);position:sticky;top:0;background:rgba(7,11,20,0.85);backdrop-filter:blur(10px);z-index:10;}
+.page-content{flex:1;overflow-y:auto;padding:20px;}
+@media (min-width:700px){.page-content{padding:24px;}}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+@media (min-width:900px){.grid-4{grid-template-columns:repeat(4,1fr);}}
+.grid-3{display:grid;grid-template-columns:1fr;gap:14px;}
+@media (min-width:900px){.grid-3{grid-template-columns:repeat(3,1fr);}}
+.card{background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-lg);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:11px;font-weight:600;color:var(--ink-500);padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);white-space:nowrap;}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.text-right{text-align:right;}
+.table-scroll{overflow-x:auto;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-box{background:var(--navy-900);border:1px solid rgba(255,255,255,0.08);border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy-800);border:1px solid rgba(57,197,244,0.3);color:var(--ink-50);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px;animation:toast-in .25s ease;}
+@keyframes toast-in{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+.tab-row{display:flex;gap:4px;background:rgba(255,255,255,0.03);border-radius:12px;padding:4px;width:fit-content;overflow-x:auto;}
+.tab-btn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;color:var(--ink-400);background:none;border:none;white-space:nowrap;transition:all .15s ease;}
+.tab-btn.active{background:rgba(57,197,244,0.15);color:var(--cyan-300);}
+.filter-chip{padding:6px 13px;border-radius:9px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-400);white-space:nowrap;transition:all .15s ease;}
+.filter-chip.active{background:rgba(57,197,244,0.18);color:var(--cyan-300);border-color:rgba(57,197,244,0.35);}
+.range-slider{width:100%;height:6px;border-radius:999px;appearance:none;-webkit-appearance:none;cursor:pointer;background:var(--navy-700);}
+.range-slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);}
+.range-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:none;}
+.install-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,rgba(57,197,244,0.12),rgba(57,197,244,0.04));border:1px solid rgba(57,197,244,0.25);border-radius:14px;margin-bottom:16px;}
+.spin{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.fade-in{animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.scrollbar-hide::-webkit-scrollbar{display:none;}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(10,15,29,0.95);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,0.07);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-between;}
+@media (max-width:900px){.bottom-nav{display:flex;}.main-area{padding-bottom:64px;}}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:none;background:none;color:var(--ink-600);font-size:9.5px;font-weight:600;border-radius:10px;}
+.bn-item.active{color:var(--cyan-300);}
+.bn-item svg{width:19px;height:19px;}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================================================
+   DOZZAA — Ad Management Platform (static PWA demo)
+   ============================================================ */
+
+/* ---------- Icon library (inline SVG, stroke-based, Lucide-style) ---------- */
+const Icon = {
+  dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>`,
+  megaphone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`,
+  barchart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>`,
+  wallet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>`,
+  radio: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>`,
+  sparkles: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 2.1 11 6l3.9 1.1L11 8.2 9.9 12 8.8 8.2 4.9 7.1 8.8 6Z"/><path d="M19 14.5 17.8 17l-2.5 1.2 2.5 1.2L19 22l1.2-2.6 2.5-1.2-2.5-1.2Z"/></svg>`,
+  mappin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h.1a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>`,
+  logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  chevronLeft: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+  chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`,
+  chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`,
+  menu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`,
+  x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  eyeOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A10.4 10.4 0 0 1 12 4c6.5 0 10 7 10 7a13 13 0 0 1-1.7 2.5M6.6 6.6C4.3 8.2 2 11 2 11s3.5 7 10 7a9.9 9.9 0 0 0 5-1.4"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/></svg>`,
+  trendUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
+  trendDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>`,
+  cart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>`,
+  zap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  arrowUpRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><polyline points="22 4 12 14.5 9 11.5"/></svg>`,
+  alertTriangle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1.5 14a2 2 0 0 1-2 1.8H8.5a2 2 0 0 1-2-1.8L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2 2 0 1 1 2.8 2.8L11 15.7 7 16.7l1-4Z"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,
+  pause: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`,
+  heart: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.3 2 4.5 5.8 4 8 3.7 10 5 12 7c2-2 4-3.3 6.2-3 3.8.5 5.4 4.3 3.8 7.7C19.5 16.4 12 21 12 21Z"/></svg>`,
+  message: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-1.1 4.3 8.5 8.5 0 0 1-7.4 4.3 8.4 8.4 0 0 1-4.3-1.1L3 21l2-5.2A8.4 8.4 0 0 1 3.5 11.5a8.5 8.5 0 0 1 17.5 0Z"/></svg>`,
+  share: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>`,
+  copy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></svg>`,
+  refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>`,
+  save: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+  link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.4l2-2a5 5 0 0 0-7-7l-1.2 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.4l-2 2a5 5 0 0 0 7 7l1.1-1.1"/></svg>`,
+  unlink: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.8 18.8a5 5 0 0 1-7.1 0l-2-2"/><path d="M5.2 5.2a5 5 0 0 1 7.1 0l2 2"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
+  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  card: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
+  download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  smartphone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+};
+function ic(name, size=16, extraClass=""){ return `<span class="${extraClass}" style="display:inline-flex;width:${size}px;height:${size}px;flex-shrink:0;">${Icon[name]||""}</span>`; }
+</script>
+
+<script>
+/* ---------- Utility formatters ---------- */
+function formatNaira(n){
+  n = Math.round(n||0);
+  return "₦" + n.toLocaleString("en-NG");
+}
+function formatNumber(n){
+  n = n||0;
+  if (n>=1000000) return (n/1000000).toFixed(1)+"M";
+  if (n>=1000) return (n/1000).toFixed(1)+"K";
+  return String(Math.round(n));
+}
+function formatDate(d, opts){
+  d = (d instanceof Date) ? d : new Date(d);
+  opts = opts || {month:"short", day:"numeric", year:"numeric"};
+  return d.toLocaleDateString("en-US", opts);
+}
+function daysAgo(n){ const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+function daysFromNow(n){ const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString(); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+const PLATFORM_LABEL = { meta:"Meta", google:"Google", tiktok:"TikTok", twitter:"X (Twitter)" };
+const PLATFORM_BADGE_CLASS = { meta:"badge-meta", google:"badge-google", tiktok:"badge-tiktok", twitter:"badge-twitter" };
+const PLATFORM_COLOR_HEX = { meta:"#1877F2", google:"#EA4335", tiktok:"#9aa3b2", twitter:"#3bc4f2" };
+const PLATFORM_ICON_LETTER = { meta:"f", google:"G", tiktok:"T", twitter:"𝕏" };
+
+function platformBadge(platform, size){
+  const label = platform==="meta" ? "Meta" : platform==="twitter" ? "X" : (PLATFORM_LABEL[platform]||platform);
+  const cls = PLATFORM_BADGE_CLASS[platform] || "badge-meta";
+  const small = size==="sm" ? "padding:2px 8px;font-size:10px;" : "";
+  return `<span class="pill ${cls}" style="${small}">${escapeHtml(label)}</span>`;
+}
+function statusBadge(status){
+  return `<span class="pill status-${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>`;
+}
+</script>
+
+<script>
+/* ============================================================
+   DEMO DATA — seeded once into localStorage, mirrors original seed.ts
+   ============================================================ */
+const STORAGE_KEY = "dozzaa_db_v1";
+
+function buildSeedData(){
+  const now = new Date();
+  const campaigns = [
+    {
+      id:1, name:"Ramadan Sales Blast - Meta", platform:"meta", status:"live", objective:"sales",
+      budgetNaira:800000, spentNaira:412500,
+      targetLocations:["Lagos","Abuja","Kano"],
+      startDate:daysAgo(14), endDate:daysFromNow(16),
+      impressions:1420000, clicks:38500, conversions:1240, roas:3.8, ctr:2.71
+    },
+    {
+      id:2, name:"Google Search - E-Commerce", platform:"google", status:"live", objective:"sales",
+      budgetNaira:600000, spentNaira:284200,
+      targetLocations:["Lagos","Port Harcourt"],
+      startDate:daysAgo(20), endDate:daysFromNow(10),
+      impressions:890000, clicks:22100, conversions:890, roas:4.2, ctr:2.48
+    },
+    {
+      id:3, name:"TikTok Gen-Z Campaign", platform:"tiktok", status:"live", objective:"awareness",
+      budgetNaira:350000, spentNaira:198000,
+      targetLocations:["Lagos","Ibadan","Enugu"],
+      startDate:daysAgo(7), endDate:daysFromNow(23),
+      impressions:2300000, clicks:45000, conversions:320, roas:2.1, ctr:1.96
+    },
+    {
+      id:4, name:"Brand Awareness - Abuja", platform:"meta", status:"paused", objective:"awareness",
+      budgetNaira:250000, spentNaira:175000,
+      targetLocations:["Abuja"],
+      startDate:daysAgo(30), endDate:daysAgo(2),
+      impressions:540000, clicks:8200, conversions:180, roas:1.8, ctr:1.52
+    },
+    {
+      id:5, name:"Google Display - Tech Products", platform:"google", status:"draft", objective:"traffic",
+      budgetNaira:450000, spentNaira:0,
+      targetLocations:["Lagos","Abuja","Kano","Kaduna"],
+      startDate:daysFromNow(5), endDate:null,
+      impressions:0, clicks:0, conversions:0, roas:0, ctr:0
+    },
+    {
+      id:6, name:"New Year Promo - TikTok", platform:"tiktok", status:"completed", objective:"sales",
+      budgetNaira:500000, spentNaira:498000,
+      targetLocations:["Lagos","Abuja","Kano","Port Harcourt","Ibadan"],
+      startDate:daysAgo(45), endDate:daysAgo(15),
+      impressions:3100000, clicks:62000, conversions:2100, roas:5.1, ctr:2.0
+    }
+  ];
+
+  const socialPosts = [
+    {
+      id:1, platform:"meta",
+      content:"🔥 Big deals this season! Our Ramadan collection is here. Shop premium quality at the best prices. Lagos, Abuja, Kano - we deliver to you! 🛍️ #RamadanSales #NigeriaFashion",
+      mediaUrl:"https://images.pexels.com/photos/16114746/pexels-photo-16114746.jpeg", mediaType:"image",
+      likes:1240, comments:89, shares:234, reach:45200, isBoosted:true, campaignId:1, publishedAt:daysAgo(3)
+    },
+    {
+      id:2, platform:"meta",
+      content:"Meet our team! We are passionate about connecting Nigerian businesses with their customers online. DM us to get started 📲 #DigitalMarketing #NigeriaMarketing",
+      mediaUrl:"https://images.pexels.com/photos/17792266/pexels-photo-17792266.jpeg", mediaType:"image",
+      likes:567, comments:34, shares:78, reach:12800, isBoosted:false, campaignId:null, publishedAt:daysAgo(5)
+    },
+    {
+      id:3, platform:"tiktok",
+      content:"POV: You just discovered the best way to shop online in Nigeria 🇳🇬✨ Fast delivery, genuine products, unbeatable prices! #NaijaTikTok #ShopOnline",
+      mediaUrl:null, mediaType:"video",
+      likes:8900, comments:420, shares:1100, reach:180000, isBoosted:true, campaignId:3, publishedAt:daysAgo(2)
+    },
+    {
+      id:4, platform:"tiktok",
+      content:"Wetin you dey wait for? 🤔 Your dream product dey wait for you! Click link in bio to order now 🔗 #NaijaTikTok #PidginContent",
+      mediaUrl:null, mediaType:"video",
+      likes:4200, comments:198, shares:567, reach:95000, isBoosted:false, campaignId:null, publishedAt:daysAgo(4)
+    },
+    {
+      id:5, platform:"google",
+      content:"Discover our latest tech accessories - Ships from Lagos, delivered nationwide within 48 hours. Free returns on all orders above ₦10,000",
+      mediaUrl:null, mediaType:"image",
+      likes:0, comments:12, shares:0, reach:22400, isBoosted:false, campaignId:null, publishedAt:daysAgo(6)
+    }
+  ];
+
+  // analytics snapshots, last 30 days x 4 platforms
+  const platforms = ["meta","google","tiktok","twitter"];
+  const analyticsSnapshots = [];
+  for (let i=29;i>=0;i--){
+    for (const platform of platforms){
+      const base = platform==="meta"?45000:platform==="google"?28000:platform==="tiktok"?75000:8000;
+      const variation = 0.7 + Math.random()*0.6;
+      const impressions = Math.floor(base*variation);
+      const baseCtr = platform==="meta"?2.5:platform==="google"?2.2:platform==="tiktok"?1.9:1.5;
+      const clicks = Math.floor(impressions*(baseCtr/100)*(0.8+Math.random()*0.4));
+      const conversions = Math.floor(clicks*0.035*(0.6+Math.random()*0.8));
+      const spend = Math.floor(impressions*0.28*variation);
+      const roas = 2.0 + Math.random()*3.5;
+      analyticsSnapshots.push({
+        platform, date:daysAgo(i),
+        impressions, clicks, conversions, spend,
+        roas: parseFloat(roas.toFixed(2)),
+        ctr: parseFloat((clicks/impressions*100).toFixed(2))
+      });
+    }
+  }
+
+  const aiRecommendations = [
+    {
+      id:1, type:"budget_shift", title:"Shift 10% Budget from TikTok → Google Ads",
+      body:"Your Google Ads campaign is achieving a ROAS of 4.2x compared to TikTok's 2.1x. Reallocating ₦35,000 daily could generate an additional ₦84,000 in revenue.",
+      platform:"google", campaignId:2, isApplied:false
+    },
+    {
+      id:2, type:"targeting", title:"Expand to Kano & Kaduna for Meta Campaign",
+      body:"Kano and Kaduna show high engagement (CTR >3%) for similar product categories but low ad saturation. Estimated 40% lower CPM than Lagos.",
+      platform:"meta", campaignId:1, isApplied:false
+    },
+    {
+      id:3, type:"copy", title:"Try Pidgin Copy for TikTok – +23% Est. Engagement",
+      body:"Posts in Nigerian Pidgin English consistently outperform standard English for 18–28 age group on TikTok Nigeria. We've generated 3 Pidgin variants for your review.",
+      platform:"tiktok", campaignId:3, isApplied:false
+    },
+    {
+      id:4, type:"budget_shift", title:"Increase Daily Budget on Ramadan Campaign",
+      body:"Your Ramadan campaign is underdelivering by 18%. Current daily budget of ₦57,000 should be increased to ₦68,000 to capture peak evening traffic (7PM–10PM WAT).",
+      platform:"meta", campaignId:1, isApplied:true
+    }
+  ];
+
+  const adCopies = [
+    {
+      id:1, campaignId:1, platform:"meta", language:"en",
+      headline:"Ramadan Deals You Can't Miss!",
+      body:"Shop our exclusive Ramadan collection. Quality products, fast delivery across Nigeria. Order now and receive before Eid!",
+      cta:"Shop Now", isApproved:true, createdAt:daysAgo(10)
+    },
+    {
+      id:2, campaignId:1, platform:"meta", language:"pidgin",
+      headline:"Ramadan Deals Wey Go Blow Your Mind! 🔥",
+      body:"Abeg come see our Ramadan collection! Quality things dey, we go deliver reach your house anywhere for Nigeria. Order now before e finish!",
+      cta:"Buy Am Now", isApproved:false, createdAt:daysAgo(9)
+    },
+    {
+      id:3, campaignId:3, platform:"tiktok", language:"pidgin",
+      headline:"Naija Shoppers, Una Too Much! 🇳🇬",
+      body:"Wetin you dey find? E dey here! We get am. Fast delivery, real product, price wey make sense. Follow us and see vibes!",
+      cta:"Order Now", isApproved:true, createdAt:daysAgo(8)
+    },
+    {
+      id:4, campaignId:2, platform:"google", language:"en",
+      headline:"Nigeria's #1 Online Store | Free Delivery Lagos",
+      body:"Shop thousands of products online. Same-day delivery in Lagos, next-day nationwide. 30-day returns. Secure Paystack checkout.",
+      cta:"Start Shopping", isApproved:true, createdAt:daysAgo(7)
+    },
+    {
+      id:5, campaignId:3, platform:"tiktok", language:"yoruba",
+      headline:"Ẹ Wá Rà! Iye Rere Wa Níbí 🛍️",
+      body:"Àwọn ọjà tó dára jùlọ wà fún yín. A máa ń fi gbígbé ọjà wọ ìlú rẹ ní ìyára. Ọjà tó dára, ìdiyèlè tó yẹ.",
+      cta:"Ra Báyìí", isApproved:false, createdAt:daysAgo(6)
+    }
+  ];
+
+  const geoHeatmap = [
+    {state:"Lagos", impressions:450000, clicks:12500, conversions:480, spend:185000},
+    {state:"Abuja", impressions:180000, clicks:5200, conversions:210, spend:78000},
+    {state:"Kano", impressions:145000, clicks:4100, conversions:150, spend:52000},
+    {state:"Rivers", impressions:120000, clicks:3400, conversions:130, spend:48000},
+    {state:"Oyo", impressions:110000, clicks:3100, conversions:115, spend:41000},
+    {state:"Anambra", impressions:85000, clicks:2400, conversions:89, spend:31000},
+    {state:"Delta", impressions:75000, clicks:2100, conversions:78, spend:28000},
+    {state:"Kaduna", impressions:68000, clicks:1900, conversions:65, spend:24000},
+    {state:"Enugu", impressions:58000, clicks:1600, conversions:54, spend:20000},
+    {state:"Edo", impressions:52000, clicks:1450, conversions:48, spend:18000},
+    {state:"Imo", impressions:45000, clicks:1250, conversions:41, spend:15000},
+    {state:"Kwara", impressions:38000, clicks:1050, conversions:34, spend:12500},
+    {state:"Osun", impressions:32000, clicks:890, conversions:28, spend:10500},
+    {state:"Ogun", impressions:28000, clicks:780, conversions:24, spend:9200},
+    {state:"Cross River", impressions:22000, clicks:610, conversions:18, spend:7400}
+  ].map((s,i)=>({id:i+1, city:null, ...s}));
+
+  const platformConnections = [
+    { platform:"meta", accountId:"act_1234567890", accountName:"Dozzaa Demo - Meta Business", isConnected:true, lastSyncAt: now.toISOString() },
+    { platform:"google", accountId:"123-456-7890", accountName:"Dozzaa Demo - Google Ads", isConnected:true, lastSyncAt: now.toISOString() },
+    { platform:"tiktok", accountId:"TT1234567", accountName:"DozzaaDemo TikTok", isConnected:true, lastSyncAt: now.toISOString() },
+    { platform:"twitter", accountId:"@dozzaademo", accountName:"Dozzaa Demo X", isConnected:false, lastSyncAt:null }
+  ];
+
+  const budgetAllocation = {
+    name:"Q1 Master Budget", totalBudgetNaira:5000000,
+    metaPercent:40, googlePercent:30, tiktokPercent:20, twitterPercent:10,
+    autoOptimize:true
+  };
+
+  const user = {
+    name:"Chidi Okeke", email:"demo@dozzaa.ng",
+    businessName:"Okeke Digital Agency", phone:"+234 801 234 5678",
+    country:"Nigeria", currency:"NGN"
+  };
+
+  return {
+    user, campaigns, socialPosts, analyticsSnapshots, aiRecommendations,
+    adCopies, geoHeatmap, platformConnections, budgetAllocation,
+    nextCampaignId: 7, nextAdCopyId: 6
+  };
+}
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+  const fresh = buildSeedData();
+  saveDB(fresh);
+  return fresh;
+}
+function saveDB(db){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
+}
+let DB = loadDB();
+function persist(){ saveDB(DB); }
+</script>
+
+<script>
+/* ---------- Session ---------- */
+const SESSION_KEY = "dozzaa_session_v1";
+function getSession(){
+  try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); }catch(e){ return null; }
+}
+function setSession(val){
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify(val)); }catch(e){}
+}
+function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+/* ---------- Toast ---------- */
+function showToast(msg, opts){
+  opts = opts || {};
+  const root = document.getElementById("toast-root");
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.innerHTML = `${ic(opts.icon || "checkCircle", 14)}<span>${escapeHtml(msg)}</span>`;
+  root.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .2s"; setTimeout(()=>el.remove(), 220); }, opts.duration || 2200);
+}
+
+/* ---------- Router ---------- */
+const ROUTES = ["login","dashboard","campaigns","analytics","budget","social","ai-tools","geo","settings"];
+let currentRoute = "login";
+let sidebarOpen = false;
+
+function navigate(route){
+  if (!getSession() && route !== "login"){ route = "login"; }
+  currentRoute = route;
+  sidebarOpen = false;
+  renderApp();
+  const main = document.querySelector(".page-content");
+  if (main) main.scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function handleLogout(){
+  clearSession();
+  navigate("login");
+  showToast("Signed out");
+}
+</script>
+
+<script>
+/* ---------- Nav config ---------- */
+const NAV_ITEMS = [
+  { route:"dashboard", icon:"dashboard", label:"Overview" },
+  { route:"campaigns", icon:"megaphone", label:"Campaigns" },
+  { route:"analytics", icon:"barchart", label:"Analytics" },
+  { route:"budget", icon:"wallet", label:"Budget Optimizer" },
+  { route:"social", icon:"radio", label:"Social Feed & Boost" },
+  { route:"ai-tools", icon:"sparkles", label:"AI Creative Tools" },
+  { route:"geo", icon:"mappin", label:"Geo Targeting" },
+  { route:"settings", icon:"settings", label:"Settings" },
+];
+const BOTTOM_NAV_ITEMS = [
+  { route:"dashboard", icon:"dashboard", label:"Home" },
+  { route:"campaigns", icon:"megaphone", label:"Campaigns" },
+  { route:"analytics", icon:"barchart", label:"Analytics" },
+  { route:"ai-tools", icon:"sparkles", label:"AI" },
+  { route:"settings", icon:"settings", label:"Settings" },
+];
+
+function logoMarkSVG(size){
+  // Simplified vector "D + lightning" mark in brand colors, used in-app (crisp at any size)
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 6h11c8.8 0 16 7.2 16 16s-7.2 16-16 16H10V6z" fill="#1c2c4d" stroke="#27406b" stroke-width="1"/>
+    <path d="M25 6c8.8 0 16 7.2 16 16s-7.2 16-16 16" fill="none" stroke="#27406b" stroke-width="0"/>
+    <path d="M27 9 14 25h7l-3 14L33 21h-7l1-12z" fill="#39c5f4"/>
+  </svg>`;
+}
+
+function sidebarHTML(){
+  const user = DB.user;
+  const initial = (user.name||"U").charAt(0).toUpperCase();
+  return `
+  <div class="sidebar-overlay ${sidebarOpen?'show':''}" onclick="sidebarOpen=false;renderApp();"></div>
+  <aside class="sidebar ${sidebarOpen?'open':''}">
+    <div style="display:flex;align-items:center;gap:10px;padding:18px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      ${logoMarkSVG(34)}
+      <div style="min-width:0;">
+        <p style="margin:0;font-weight:800;font-size:14.5px;color:#fff;letter-spacing:.2px;">Dozzaa</p>
+        <p style="margin:0;font-size:9.5px;color:var(--cyan-400);font-weight:700;letter-spacing:1.5px;">AD PLATFORM</p>
+      </div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <p style="margin:0 0 8px;font-size:9.5px;font-weight:700;color:var(--ink-600);letter-spacing:1px;text-transform:uppercase;">Connected</p>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${(DB.platformConnections||[]).filter(c=>c.isConnected).map(c=>`<span class="pill ${PLATFORM_BADGE_CLASS[c.platform]}" style="padding:2px 8px;font-size:9.5px;">${PLATFORM_LABEL[c.platform]}</span>`).join("")}
+      </div>
+    </div>
+    <nav style="flex:1;overflow-y:auto;padding:10px 0;">
+      ${NAV_ITEMS.map(item => `
+        <button class="nav-item ${currentRoute===item.route?'active':''}" onclick="navigate('${item.route}')">
+          ${ic(item.icon,18)}<span>${item.label}</span>
+        </button>
+      `).join("")}
+    </nav>
+    <div style="padding:12px;border-top:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cyan-500),var(--navy-600));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${initial}</div>
+        <div style="min-width:0;flex:1;">
+          <p style="margin:0;font-size:13px;font-weight:600;color:#fff;" class="truncate">${escapeHtml(user.name)}</p>
+          <p style="margin:0;font-size:10.5px;color:var(--ink-600);" class="truncate">${escapeHtml(user.businessName||user.email)}</p>
+        </div>
+      </div>
+      <button class="nav-item" style="color:var(--ink-500);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-500)'" onclick="handleLogout()">
+        ${ic("logout",15)}<span>Logout</span>
+      </button>
+    </div>
+  </aside>`;
+}
+
+function bottomNavHTML(){
+  return `<nav class="bottom-nav">
+    ${BOTTOM_NAV_ITEMS.map(item => `
+      <button class="bn-item ${currentRoute===item.route?'active':''}" onclick="navigate('${item.route}')">
+        ${ic(item.icon,19)}<span>${item.label}</span>
+      </button>
+    `).join("")}
+  </nav>`;
+}
+
+function topbarHTML(title, subtitle){
+  return `
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+      <button class="ghost-btn" style="display:none;padding:8px;border-radius:9px;" id="hamburger-btn" onclick="sidebarOpen=true;renderApp();">
+        ${ic("menu",18)}
+      </button>
+      <div style="min-width:0;">
+        <h1 style="margin:0;font-size:16px;font-weight:700;color:#fff;" class="truncate">${title}</h1>
+        ${subtitle ? `<p style="margin:2px 0 0;font-size:11.5px;color:var(--ink-600);" class="truncate">${subtitle}</p>` : ""}
+      </div>
+    </div>
+  </div>
+  <style>@media (max-width:900px){#hamburger-btn{display:flex !important;}}</style>
+  `;
+}
+
+/* ---------- Page renderer registry (filled in by page modules below) ---------- */
+const PageRenderers = {};
+
+function renderApp(){
+  const app = document.getElementById("app");
+  if (!getSession()){
+    app.innerHTML = PageRenderers.login();
+    afterRenderHooks.login && afterRenderHooks.login();
+    return;
+  }
+  if (currentRoute === "login") currentRoute = "dashboard";
+
+  const titles = {
+    dashboard: ["Overview", null],
+    campaigns: ["Campaigns", "Manage all your ad campaigns"],
+    analytics: ["Analytics", "Cross-platform performance insights"],
+    budget: ["Budget Optimizer", "Intelligent budget distribution across platforms"],
+    social: ["Social Feed & Boost", "View organic posts and boost the best ones"],
+    "ai-tools": ["AI Creative Tools", "Generate localized ad copy for any platform & language"],
+    geo: ["Nigeria Geo Targeting", "Ad performance heatmap across Nigerian states"],
+    settings: ["Settings", "Manage your account, platforms, and preferences"],
+  };
+  const [title, subtitle] = titles[currentRoute] || ["Dozzaa", null];
+  const subtitleResolved = currentRoute==="dashboard" ? `Last updated ${formatDate(new Date(),{month:"short",day:"2-digit",year:"numeric"})} · ${new Date().toTimeString().slice(0,5)}` : subtitle;
+
+  app.innerHTML = `
+    <div class="app-shell">
+      ${sidebarHTML()}
+      <div class="main-area">
+        ${topbarHTML(title, subtitleResolved)}
+        <main class="page-content">
+          ${PageRenderers[currentRoute] ? PageRenderers[currentRoute]() : "<p>Not found</p>"}
+        </main>
+      </div>
+      ${bottomNavHTML()}
+    </div>
+  `;
+  if (afterRenderHooks[currentRoute]) afterRenderHooks[currentRoute]();
+}
+
+const afterRenderHooks = {};
+</script>
+
+<script>
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+let loginShowPassword = false;
+let loginError = "";
+let loginLoading = false;
+
+PageRenderers.login = function(){
+  const feats = ["🇳🇬 Naira Billing","🤖 AI Copy Generator","📊 Cross-Platform ROAS","📍 Nigeria Geo Maps","💡 Budget Optimizer","⚡ Social Post Boost"];
+  return `
+  <div style="min-height:100vh;background:var(--navy-950);display:flex;">
+    <div class="login-left" style="display:none;width:50%;position:relative;overflow:hidden;align-items:center;justify-content:center;padding:48px;
+      background:radial-gradient(ellipse at 30% 50%, rgba(57,197,244,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(57,197,244,0.08) 0%, transparent 60%), var(--navy-950);">
+      <div style="position:absolute;inset:0;opacity:.08;background-image:linear-gradient(#39c5f4 1px,transparent 1px),linear-gradient(90deg,#39c5f4 1px,transparent 1px);background-size:60px 60px;"></div>
+      <div style="position:relative;z-index:1;max-width:380px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:48px;">
+          ${logoMarkSVG(46)}
+          <div>
+            <h1 style="margin:0;font-size:26px;font-weight:900;color:#fff;letter-spacing:.2px;">Dozzaa</h1>
+            <p style="margin:0;color:var(--cyan-400);font-size:11px;font-weight:700;letter-spacing:2px;">AD PLATFORM</p>
+          </div>
+        </div>
+        <h2 style="font-size:30px;font-weight:800;color:#fff;line-height:1.25;margin:0 0 16px;">One dashboard.<br/><span class="gradient-text">All your ads.</span></h2>
+        <p style="color:var(--ink-400);font-size:14px;line-height:1.6;margin:0 0 28px;">The command center for Nigerian businesses running campaigns on Meta, Google, TikTok and X — with Naira billing and AI-powered copy in Pidgin, Yoruba, Igbo & Hausa.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${feats.map(f=>`<span style="font-size:12px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--ink-200);">${f}</span>`).join("")}
+        </div>
+        <div style="margin-top:38px;display:flex;align-items:center;gap:14px;">
+          <p style="font-size:11px;color:var(--ink-600);margin:0;">Integrates with</p>
+          ${["meta","google","tiktok","twitter"].map(p=>`<div style="width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,0.04);color:var(--ink-200);">${PLATFORM_ICON_LETTER[p]}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="login-right-panel" style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px 24px;">
+      <div style="width:100%;max-width:380px;">
+        <div class="login-mobile-logo" style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+          ${logoMarkSVG(36)}
+          <h1 style="margin:0;font-size:19px;font-weight:800;color:#fff;">Dozzaa</h1>
+        </div>
+
+        <div style="margin-bottom:24px;">
+          <h2 style="font-size:22px;font-weight:700;color:#fff;margin:0 0 4px;">Welcome back</h2>
+          <p style="color:var(--ink-500);font-size:13.5px;margin:0;">Sign in to your Dozzaa dashboard</p>
+        </div>
+
+        <div style="margin-bottom:18px;padding:12px 14px;border-radius:14px;background:rgba(57,197,244,0.08);border:1px solid rgba(57,197,244,0.2);">
+          <p style="margin:0 0 3px;font-size:12px;font-weight:600;color:var(--cyan-300);">🚀 Demo Account</p>
+          <p style="margin:0;font-size:12px;color:var(--ink-400);line-height:1.6;">Email: <span style="color:#fff;font-family:monospace;">demo@dozzaa.ng</span><br/>Password: <span style="color:#fff;font-family:monospace;">demo1234</span></p>
+        </div>
+
+        <form id="login-form" onsubmit="return handleLoginSubmit(event)">
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--ink-400);margin-bottom:6px;">Email Address</label>
+            <input type="email" id="login-email" value="demo@dozzaa.ng" placeholder="you@company.ng" required style="padding:12px 14px;border-radius:12px;" />
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--ink-400);margin-bottom:6px;">Password</label>
+            <div style="position:relative;">
+              <input type="${loginShowPassword?'text':'password'}" id="login-password" value="demo1234" placeholder="••••••••" required style="padding:12px 40px 12px 14px;border-radius:12px;" />
+              <button type="button" onclick="loginShowPassword=!loginShowPassword;renderApp();" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ink-500);display:flex;">
+                ${ic(loginShowPassword?'eyeOff':'eye',16)}
+              </button>
+            </div>
+          </div>
+
+          ${loginError ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(240,85,107,0.1);border:1px solid rgba(240,85,107,0.25);margin-bottom:14px;">
+            ${ic('alertCircle',14,'')}<p style="margin:0;font-size:12px;color:var(--red);">${escapeHtml(loginError)}</p>
+          </div>` : ""}
+
+          <button type="submit" class="glow-btn" style="width:100%;padding:13px;border-radius:12px;font-size:14px;" ${loginLoading?'disabled':''}>
+            ${loginLoading ? "Signing in..." : "Sign In to Dashboard"}
+          </button>
+        </form>
+
+        <p style="margin-top:22px;text-align:center;font-size:11.5px;color:var(--ink-600);">By signing in, you agree to Dozzaa's <span style="color:var(--cyan-400);">Terms of Service</span></p>
+      </div>
+    </div>
+  </div>
+  <style>
+    @media (min-width:1024px){ .login-left{display:flex !important;} .login-mobile-logo{display:none !important;} .login-right-panel{align-items:center !important;padding:24px !important;} }
+    @media (max-width:480px){ .login-right-panel{padding-top:32px !important;} }
+  </style>
+  `;
+};
+
+function handleLoginSubmit(e){
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  loginLoading = true;
+  renderApp();
+  setTimeout(()=>{
+    if (email.toLowerCase()==="demo@dozzaa.ng" && password==="demo1234"){
+      setSession({ email, loggedInAt: new Date().toISOString() });
+      loginLoading = false;
+      loginError = "";
+      navigate("dashboard");
+      showToast("Welcome back, " + DB.user.name.split(" ")[0] + "!");
+    } else {
+      loginLoading = false;
+      loginError = "Invalid email or password. Use the demo credentials above.";
+      renderApp();
+    }
+  }, 500);
+  return false;
+}
+</script>
+
+<script>
+/* ============================================================
+   BOOTSTRAP — runs after all page renderers are registered below
+   ============================================================ */
+function bootDozzaa(){
+  renderApp();
+  if ("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+}
+</script>
+
+<script>
+/* ============================================================
+   LIGHTWEIGHT SVG CHART HELPERS (no external chart library needed)
+   ============================================================ */
+function svgAreaChart(data, opts){
+  // data: array of {x: label, values: {seriesKey: number, ...}}
+  // opts: { series: [{key,color}], width, height, yFormat }
+  const w = opts.width || 600, h = opts.height || 200;
+  const padL = 38, padR = 8, padT = 10, padB = 22;
+  const innerW = w - padL - padR, innerH = h - padT - padB;
+  if (!data.length) return `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}"></svg>`;
+
+  let maxY = 0;
+  data.forEach(d => opts.series.forEach(s => { maxY = Math.max(maxY, d.values[s.key]||0); }));
+  maxY = maxY * 1.15 || 1;
+
+  const xStep = innerW / Math.max(1, data.length - 1);
+  const yFormat = opts.yFormat || formatNumber;
+
+  function pt(i, val){
+    const x = padL + i * xStep;
+    const y = padT + innerH - (val / maxY) * innerH;
+    return [x, y];
+  }
+
+  const gridLines = [0,0.25,0.5,0.75,1].map(f => {
+    const y = padT + innerH * (1-f);
+    return `<line x1="${padL}" y1="${y}" x2="${w-padR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <text x="${padL-6}" y="${y+3}" text-anchor="end" font-size="9" fill="#56657d">${yFormat(maxY*f)}</text>`;
+  }).join("");
+
+  const xLabels = data.filter((_,i)=> i % Math.ceil(data.length/6) === 0).map((d,idx) => {
+    const i = data.indexOf(d);
+    const [x] = pt(i, 0);
+    return `<text x="${x}" y="${h-6}" text-anchor="middle" font-size="9" fill="#56657d">${d.x}</text>`;
+  }).join("");
+
+  const areas = opts.series.map((s,si) => {
+    const pts = data.map((d,i) => pt(i, d.values[s.key]||0));
+    const linePath = pts.map((p,i)=> (i===0?"M":"L")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+    const areaPath = linePath + ` L${pts[pts.length-1][0].toFixed(1)},${padT+innerH} L${pts[0][0].toFixed(1)},${padT+innerH} Z`;
+    const gradId = `grad-${opts.id||'a'}-${si}`;
+    return `
+      <defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="5%" stop-color="${s.color}" stop-opacity="0.35"/>
+        <stop offset="95%" stop-color="${s.color}" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="${areaPath}" fill="url(#${gradId})"/>
+      <path d="${linePath}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    `;
+  }).join("");
+
+  return `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${gridLines}${areas}${xLabels}</svg>`;
+}
+
+function svgPieChart(data, opts){
+  // data: [{label, value, color}]
+  const size = opts.size || 160;
+  const cx = size/2, cy = size/2;
+  const rOuter = size*0.42, rInner = size*0.27;
+  const total = data.reduce((s,d)=>s+d.value,0) || 1;
+  let angle = -90;
+  const slices = data.map(d => {
+    const frac = d.value/total;
+    const sweep = frac*360;
+    const a0 = angle, a1 = angle+sweep;
+    angle = a1;
+    const toXY = (a, r) => [cx + r*Math.cos(a*Math.PI/180), cy + r*Math.sin(a*Math.PI/180)];
+    const [x0o,y0o] = toXY(a0, rOuter);
+    const [x1o,y1o] = toXY(a1, rOuter);
+    const [x0i,y0i] = toXY(a1, rInner);
+    const [x1i,y1i] = toXY(a0, rInner);
+    const largeArc = sweep > 180 ? 1 : 0;
+    const path = `M${x0o},${y0o} A${rOuter},${rOuter} 0 ${largeArc} 1 ${x1o},${y1o} L${x0i},${y0i} A${rInner},${rInner} 0 ${largeArc} 0 ${x1i},${y1i} Z`;
+    return `<path d="${path}" fill="${d.color}" opacity="0.9"/>`;
+  }).join("");
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${slices}</svg>`;
+}
+
+function svgBarChart(data, opts){
+  // data: [{label, value, color}]
+  const w = opts.width || 400, h = opts.height || 180;
+  const padL = 4, padR = 4, padT = 10, padB = 24;
+  const innerW = w-padL-padR, innerH = h-padT-padB;
+  const maxVal = Math.max(...data.map(d=>d.value), 0.001) * 1.2;
+  const barW = innerW/data.length*0.5;
+  const gap = innerW/data.length;
+  const bars = data.map((d,i) => {
+    const barH = (d.value/maxVal)*innerH;
+    const x = padL + i*gap + (gap-barW)/2;
+    const y = padT + innerH - barH;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="4" fill="${d.color}" opacity="0.85"/>
+            <text x="${(x+barW/2).toFixed(1)}" y="${h-6}" text-anchor="middle" font-size="10" fill="#94a3b8">${d.label}</text>
+            <text x="${(x+barW/2).toFixed(1)}" y="${(y-6).toFixed(1)}" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">${d.value.toFixed(1)}x</text>`;
+  }).join("");
+  return `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${bars}</svg>`;
+}
+</script>
+
+<script>
+/* ============================================================
+   ANALYTICS AGGREGATION HELPERS
+   ============================================================ */
+function getAnalyticsByPlatform(){
+  const result = {};
+  (DB.analyticsSnapshots||[]).forEach(s => {
+    if (!result[s.platform]) result[s.platform] = { impressions:0, clicks:0, spend:0, conversions:0, roasSum:0, count:0 };
+    const r = result[s.platform];
+    r.impressions += s.impressions;
+    r.clicks += s.clicks;
+    r.spend += s.spend;
+    r.conversions += s.conversions;
+    r.roasSum += s.roas;
+    r.count += 1;
+  });
+  Object.keys(result).forEach(p => { result[p].roas = result[p].count ? result[p].roasSum/result[p].count : 0; });
+  return result;
+}
+function getDailyTrend(days){
+  days = days || 14;
+  const byDate = {};
+  (DB.analyticsSnapshots||[]).forEach(s => {
+    const dateKey = s.date.slice(0,10);
+    if (!byDate[dateKey]) byDate[dateKey] = { date:dateKey, impressions:0, clicks:0, spend:0, conversions:0 };
+    byDate[dateKey].impressions += s.impressions;
+    byDate[dateKey].clicks += s.clicks;
+    byDate[dateKey].spend += s.spend;
+    byDate[dateKey].conversions += s.conversions;
+  });
+  return Object.values(byDate).sort((a,b)=>a.date.localeCompare(b.date)).slice(-days);
+}
+
+/* ============================================================
+   DASHBOARD (OVERVIEW) PAGE
+   ============================================================ */
+PageRenderers.dashboard = function(){
+  const campaigns = DB.campaigns || [];
+  const liveCampaigns = campaigns.filter(c => c.status==="live");
+  const totalSpend = campaigns.reduce((s,c)=>s+c.spentNaira,0);
+  const totalImpressions = campaigns.reduce((s,c)=>s+c.impressions,0);
+  const totalConversions = campaigns.reduce((s,c)=>s+c.conversions,0);
+  const roasArr = campaigns.filter(c=>c.roas>0).map(c=>c.roas);
+  const avgROAS = roasArr.length ? roasArr.reduce((a,b)=>a+b,0)/roasArr.length : 0;
+
+  const byPlatform = getAnalyticsByPlatform();
+  const pieData = Object.entries(byPlatform).map(([platform,data]) => ({
+    label: PLATFORM_LABEL[platform]||platform, value: data.spend, color: PLATFORM_COLOR_HEX[platform]||"#39c5f4", platform
+  }));
+  const trend = getDailyTrend(14);
+  const trendChart = svgAreaChart(
+    trend.map(d => ({ x: formatDate(d.date,{month:"short",day:"numeric"}), values:{impressions:d.impressions, clicks:d.clicks} })),
+    { id:"trend", series:[{key:"impressions",color:"#39c5f4"},{key:"clicks",color:"#22c97e"}], height:200, yFormat:formatNumber }
+  );
+
+  const pendingRecs = (DB.aiRecommendations||[]).filter(r=>!r.isApplied);
+
+  return `
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:18px;">
+    <!-- Stats -->
+    <div class="grid-4">
+      ${statCard("Total Spend", formatNaira(totalSpend), "+12.4% this month", "trendUp", "wallet", "#39c5f4")}
+      ${statCard("Impressions", formatNumber(totalImpressions), "+18.7%", "trendUp", "eye", "#5b9bf5")}
+      ${statCard("Avg ROAS", avgROAS.toFixed(2)+"x", "+0.4x", "trendUp", "trendUp", "#22c97e")}
+      ${statCard("Conversions", formatNumber(totalConversions), "+23.1%", "trendUp", "cart", "#a78bfa")}
+    </div>
+
+    <!-- Charts row -->
+    <div class="grid-3" style="grid-template-columns:1fr;">
+      <div class="card" style="padding:18px;grid-column:span 1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Performance Trend</h3>
+            <p style="margin:2px 0 0;font-size:11px;color:var(--ink-600);">Last 14 days — all platforms</p>
+          </div>
+          <button onclick="navigate('analytics')" style="background:none;border:none;color:var(--cyan-400);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:3px;">Full report ${ic('chevronRight',12)}</button>
+        </div>
+        ${trendChart}
+        <div style="display:flex;gap:16px;margin-top:8px;">
+          <span style="font-size:11px;color:var(--ink-400);display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#39c5f4;display:inline-block;"></span>Impressions</span>
+          <span style="font-size:11px;color:var(--ink-400);display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#22c97e;display:inline-block;"></span>Clicks</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:18px;">
+        <h3 style="margin:0 0 2px;font-size:13.5px;font-weight:600;color:#fff;">Spend by Platform</h3>
+        <p style="margin:0 0 14px;font-size:11px;color:var(--ink-600);">30-day breakdown</p>
+        <div style="display:flex;justify-content:center;">${svgPieChart(pieData,{size:150})}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+          ${pieData.map(d => `
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+              <span style="display:flex;align-items:center;gap:7px;color:var(--ink-400);"><span style="width:8px;height:8px;border-radius:50%;background:${d.color};display:inline-block;"></span>${d.label}</span>
+              <span style="color:#fff;font-weight:500;">${formatNaira(d.value)}</span>
+            </div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    ${pendingRecs.length ? `
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:24px;height:24px;border-radius:7px;background:rgba(57,197,244,0.15);display:flex;align-items:center;justify-content:center;color:var(--cyan-400);">${ic('zap',13)}</div>
+        <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">AI Recommendations</h3>
+        <span style="font-size:11px;background:rgba(57,197,244,0.15);color:var(--cyan-300);padding:2px 9px;border-radius:999px;font-weight:600;">${pendingRecs.length} new</span>
+      </div>
+      <div class="grid-3">
+        ${pendingRecs.map(rec => `
+          <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:13px;padding:14px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+              <div style="display:flex;align-items:flex-start;gap:7px;">
+                <span style="color:var(--amber);flex-shrink:0;margin-top:1px;">${ic('alertTriangle',13)}</span>
+                <p style="margin:0;font-size:12.5px;font-weight:600;color:#fff;line-height:1.3;">${escapeHtml(rec.title)}</p>
+              </div>
+              <button onclick="dismissRecommendation(${rec.id})" style="background:none;border:none;color:var(--ink-700);flex-shrink:0;">${ic('x',12)}</button>
+            </div>
+            <p style="margin:0 0 11px;font-size:11.5px;color:var(--ink-500);line-height:1.5;">${escapeHtml(rec.body)}</p>
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${rec.platform ? platformBadge(rec.platform,"sm") : ""}
+              <button onclick="applyRecommendation(${rec.id})" style="margin-left:auto;background:none;border:none;color:var(--cyan-400);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:4px;">${ic('checkCircle',11)}Apply</button>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>` : ""}
+
+    <!-- Active Campaigns -->
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Active Campaigns</h3>
+          <p style="margin:2px 0 0;font-size:11px;color:var(--ink-600);">${liveCampaigns.length} campaigns running</p>
+        </div>
+        <button onclick="navigate('campaigns')" style="background:none;border:none;color:var(--cyan-400);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:4px;">Manage all ${ic('arrowUpRight',12)}</button>
+      </div>
+      ${liveCampaigns.length===0 ? `
+        <div style="text-align:center;padding:48px 0;">
+          ${ic('barchart',32,'')}<p style="color:var(--ink-600);font-size:13px;margin:12px 0 4px;">No active campaigns</p>
+        </div>` : `
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Campaign</th><th class="hide-sm">Platform</th><th class="text-right">Budget</th>
+            <th class="text-right hide-md">Impressions</th><th class="text-right hide-lg">CTR</th><th class="text-right">ROAS</th>
+          </tr></thead>
+          <tbody>
+            ${liveCampaigns.map(c => `
+              <tr>
+                <td>
+                  <p style="margin:0;font-weight:500;color:#fff;font-size:13px;" class="truncate">${escapeHtml(c.name)}</p>
+                  <div style="margin-top:5px;height:4px;width:110px;background:rgba(255,255,255,0.06);border-radius:99px;">
+                    <div style="height:100%;background:var(--cyan-500);border-radius:99px;width:${Math.min(100,(c.spentNaira/c.budgetNaira)*100)}%;"></div>
+                  </div>
+                </td>
+                <td class="hide-sm">${platformBadge(c.platform,"sm")}</td>
+                <td class="text-right">
+                  <p style="margin:0;color:#fff;font-weight:500;font-size:12px;">${formatNaira(c.budgetNaira)}</p>
+                  <p style="margin:0;color:var(--ink-600);font-size:10px;">${formatNaira(c.spentNaira)} spent</p>
+                </td>
+                <td class="text-right hide-md"><span style="color:var(--ink-200);font-size:12px;">${formatNumber(c.impressions)}</span></td>
+                <td class="text-right hide-lg"><span style="color:var(--ink-200);font-size:12px;">${c.ctr.toFixed(2)}%</span></td>
+                <td class="text-right"><span style="font-size:12px;font-weight:700;color:${c.roas>=3?'var(--emerald)':c.roas>=2?'var(--amber)':'var(--red)'};">${c.roas.toFixed(1)}x</span></td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`}
+    </div>
+  </div>
+  <style>
+    @media (max-width:640px){.hide-sm{display:none;}}
+    @media (max-width:760px){.hide-md{display:none;}}
+    @media (max-width:900px){.hide-lg{display:none;}}
+  </style>
+  `;
+};
+
+function statCard(title, value, change, changeIcon, icon, color){
+  return `
+  <div class="card" style="padding:16px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+      <p style="margin:0;font-size:11.5px;color:var(--ink-500);font-weight:500;">${title}</p>
+      <span style="color:${color};">${ic(icon,16)}</span>
+    </div>
+    <p style="margin:0 0 6px;font-size:21px;font-weight:700;color:#fff;">${value}</p>
+    <p style="margin:0;font-size:11px;color:var(--emerald);display:flex;align-items:center;gap:3px;">${ic(changeIcon,11)}${change}</p>
+  </div>`;
+}
+
+function applyRecommendation(id){
+  const rec = (DB.aiRecommendations||[]).find(r=>r.id===id);
+  if (rec) rec.isApplied = true;
+  persist();
+  renderApp();
+  showToast("Recommendation applied");
+}
+function dismissRecommendation(id){
+  DB.aiRecommendations = (DB.aiRecommendations||[]).filter(r=>r.id!==id);
+  persist();
+  renderApp();
+}
+</script>
+
+<script>
+/* ============================================================
+   CAMPAIGNS PAGE
+   ============================================================ */
+const NIGERIA_STATES = ["Lagos","Abuja","Kano","Rivers","Oyo","Anambra","Delta","Kaduna","Enugu","Edo","Imo","Kwara","Osun","Ogun","Cross River","Borno","Sokoto","Adamawa","Bauchi","Plateau","Kogi","Abia","Akwa Ibom"];
+const OBJECTIVES = ["awareness","traffic","engagement","leads","sales","app_installs"];
+
+let campaignsSearch = "";
+let campaignsPlatformFilter = "all";
+let campaignsStatusFilter = "all";
+let campaignModalOpen = false;
+let editingCampaignId = null;
+let campaignForm = {};
+let campaignSaving = false;
+
+function freshCampaignForm(){
+  return { name:"", platform:"meta", objective:"awareness", budgetNaira:"", targetLocations:[], startDate:"", endDate:"", status:"draft" };
+}
+
+PageRenderers.campaigns = function(){
+  const campaigns = DB.campaigns || [];
+  const filtered = campaigns.filter(c => {
+    const matchSearch = c.name.toLowerCase().includes(campaignsSearch.toLowerCase());
+    const matchPlatform = campaignsPlatformFilter==="all" || c.platform===campaignsPlatformFilter;
+    const matchStatus = campaignsStatusFilter==="all" || c.status===campaignsStatusFilter;
+    return matchSearch && matchPlatform && matchStatus;
+  });
+
+  return `
+  <div class="fade-in">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;">
+      <div style="position:relative;flex:1;min-width:180px;">
+        <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-600);">${ic('search',14)}</span>
+        <input type="text" placeholder="Search campaigns..." value="${escapeHtml(campaignsSearch)}" oninput="campaignsSearch=this.value;renderApp();" style="padding-left:32px;border-radius:10px;" />
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;" class="scrollbar-hide">
+        ${["all","meta","google","tiktok","twitter"].map(p => `
+          <button class="filter-chip ${campaignsPlatformFilter===p?'active':''}" onclick="campaignsPlatformFilter='${p}';renderApp();">${p==="all"?"All":PLATFORM_LABEL[p]||p}</button>`).join("")}
+      </div>
+      <button class="glow-btn" style="padding:9px 16px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap;" onclick="openCreateCampaign()">${ic('plus',14)}New Campaign</button>
+    </div>
+
+    <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;" class="scrollbar-hide">
+      ${["all","live","paused","draft","completed"].map(s => `
+        <button class="filter-chip ${campaignsStatusFilter===s?'active':''}" onclick="campaignsStatusFilter='${s}';renderApp();">${s==="all"?"All Status":s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join("")}
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Campaign</th><th class="hide-sm">Platform</th><th class="hide-md">Status</th>
+            <th class="text-right">Budget</th><th class="text-right hide-lg">Impressions</th>
+            <th class="text-right hide-xl">CTR</th><th class="text-right">ROAS</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${filtered.length===0 ? `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--ink-600);">No campaigns match your filters</td></tr>` :
+            filtered.map(c => `
+              <tr>
+                <td>
+                  <p style="margin:0;font-weight:500;color:#fff;font-size:13px;max-width:200px;" class="truncate">${escapeHtml(c.name)}</p>
+                  <p style="margin:2px 0 0;font-size:10.5px;color:var(--ink-600);">${(c.targetLocations||[]).slice(0,2).join(", ")}${(c.targetLocations||[]).length>2?` +${c.targetLocations.length-2}`:""}</p>
+                </td>
+                <td class="hide-sm">${platformBadge(c.platform,"sm")}</td>
+                <td class="hide-md">${statusBadge(c.status)}</td>
+                <td class="text-right">
+                  <p style="margin:0;color:#fff;font-size:12px;font-weight:500;">${formatNaira(c.budgetNaira)}</p>
+                  <p style="margin:0;color:var(--ink-600);font-size:10px;">${formatNaira(c.spentNaira)} spent</p>
+                </td>
+                <td class="text-right hide-lg"><span style="color:var(--ink-200);font-size:12px;">${formatNumber(c.impressions)}</span></td>
+                <td class="text-right hide-xl"><span style="color:var(--ink-200);font-size:12px;">${c.ctr.toFixed(2)}%</span></td>
+                <td class="text-right"><span style="font-size:12px;font-weight:700;color:${c.roas>=3?'var(--emerald)':c.roas>=2?'var(--amber)':c.roas===0?'var(--ink-700)':'var(--red)'};">${c.roas>0?c.roas.toFixed(1)+"x":"—"}</span></td>
+                <td class="text-right">
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
+                    ${(c.status==="live"||c.status==="paused") ? `<button onclick="toggleCampaignStatus(${c.id})" title="${c.status==='live'?'Pause':'Resume'}" style="background:none;border:none;color:var(--ink-500);padding:6px;border-radius:8px;">${ic(c.status==='live'?'pause':'play',13)}</button>` : ""}
+                    <button onclick="openEditCampaign(${c.id})" style="background:none;border:none;color:var(--ink-500);padding:6px;border-radius:8px;">${ic('edit',13)}</button>
+                    <button onclick="deleteCampaign(${c.id})" style="background:none;border:none;color:var(--ink-500);padding:6px;border-radius:8px;">${ic('trash',13)}</button>
+                  </div>
+                </td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  ${campaignModalOpen ? campaignModalHTML() : ""}
+  <style>
+    @media (max-width:520px){.hide-sm{display:none;}}
+    @media (max-width:680px){.hide-md{display:none;}}
+    @media (max-width:860px){.hide-lg{display:none;}}
+    @media (max-width:1040px){.hide-xl{display:none;}}
+  </style>
+  `;
+};
+
+function campaignModalHTML(){
+  const f = campaignForm;
+  const isEdit = editingCampaignId !== null;
+  return `
+  <div class="modal-overlay" onclick="if(event.target===this){closeCampaignModal()}">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <h2 style="margin:0;font-size:15px;font-weight:600;color:#fff;">${isEdit?"Edit Campaign":"New Campaign"}</h2>
+        <button onclick="closeCampaignModal()" style="background:none;border:none;color:var(--ink-500);">${ic('x',18)}</button>
+      </div>
+      <div style="padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Campaign Name</label>
+          <input type="text" id="cf-name" value="${escapeHtml(f.name)}" placeholder="e.g., Ramadan Sales - Meta Q1" oninput="campaignForm.name=this.value" />
+        </div>
+        <div class="grid-2">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Platform</label>
+            <select id="cf-platform" onchange="campaignForm.platform=this.value">
+              <option value="meta" ${f.platform==='meta'?'selected':''}>Meta (Facebook/Instagram)</option>
+              <option value="google" ${f.platform==='google'?'selected':''}>Google Ads</option>
+              <option value="tiktok" ${f.platform==='tiktok'?'selected':''}>TikTok</option>
+              <option value="twitter" ${f.platform==='twitter'?'selected':''}>X (Twitter)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Objective</label>
+            <select id="cf-objective" onchange="campaignForm.objective=this.value">
+              ${OBJECTIVES.map(o=>`<option value="${o}" ${f.objective===o?'selected':''}>${o.replace("_"," ").replace(/\\b\\w/g,l=>l.toUpperCase())}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Budget (₦)</label>
+          <input type="number" id="cf-budget" value="${escapeHtml(f.budgetNaira)}" placeholder="500000" oninput="campaignForm.budgetNaira=this.value" />
+        </div>
+        <div class="grid-2">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Start Date</label>
+            <input type="date" id="cf-start" value="${f.startDate}" onchange="campaignForm.startDate=this.value" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">End Date</label>
+            <input type="date" id="cf-end" value="${f.endDate}" onchange="campaignForm.endDate=this.value" />
+          </div>
+        </div>
+        ${isEdit ? `
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Status</label>
+          <select id="cf-status" onchange="campaignForm.status=this.value">
+            <option value="draft" ${f.status==='draft'?'selected':''}>Draft</option>
+            <option value="live" ${f.status==='live'?'selected':''}>Live</option>
+            <option value="paused" ${f.status==='paused'?'selected':''}>Paused</option>
+            <option value="completed" ${f.status==='completed'?'selected':''}>Completed</option>
+          </select>
+        </div>` : ""}
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:8px;">Target Locations (Nigeria)</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:130px;overflow-y:auto;">
+            ${NIGERIA_STATES.map(state => `
+              <button type="button" onclick="toggleCampaignLocation('${state}')" class="filter-chip ${f.targetLocations.includes(state)?'active':''}">${state}</button>`).join("")}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding:18px 22px;">
+        <button class="ghost-btn" style="flex:1;padding:11px;border-radius:11px;font-size:13px;" onclick="closeCampaignModal()">Cancel</button>
+        <button class="glow-btn" style="flex:1;padding:11px;border-radius:11px;font-size:13px;" ${campaignSaving||!f.name||!f.budgetNaira?'disabled':''} onclick="saveCampaign()">
+          ${campaignSaving ? "Saving..." : isEdit ? "Update Campaign" : "Create Campaign"}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openCreateCampaign(){ editingCampaignId=null; campaignForm=freshCampaignForm(); campaignModalOpen=true; renderApp(); }
+function openEditCampaign(id){
+  const c = DB.campaigns.find(x=>x.id===id);
+  if (!c) return;
+  editingCampaignId = id;
+  campaignForm = {
+    name:c.name, platform:c.platform, objective:c.objective, budgetNaira:String(c.budgetNaira),
+    targetLocations:[...(c.targetLocations||[])], startDate:(c.startDate||"").slice(0,10), endDate:(c.endDate||"").slice(0,10), status:c.status
+  };
+  campaignModalOpen = true;
+  renderApp();
+}
+function closeCampaignModal(){ campaignModalOpen=false; renderApp(); }
+function toggleCampaignLocation(loc){
+  const arr = campaignForm.targetLocations;
+  const idx = arr.indexOf(loc);
+  if (idx>=0) arr.splice(idx,1); else arr.push(loc);
+  renderApp();
+}
+function saveCampaign(){
+  const f = campaignForm;
+  if (!f.name || !f.budgetNaira) return;
+  campaignSaving = true;
+  renderApp();
+  setTimeout(()=>{
+    const budgetNaira = parseInt(String(f.budgetNaira).replace(/,/g,""),10) || 0;
+    if (editingCampaignId){
+      const c = DB.campaigns.find(x=>x.id===editingCampaignId);
+      Object.assign(c, { name:f.name, platform:f.platform, objective:f.objective, budgetNaira, targetLocations:f.targetLocations, startDate:f.startDate||null, endDate:f.endDate||null, status:f.status });
+    } else {
+      DB.campaigns.unshift({
+        id: DB.nextCampaignId++, name:f.name, platform:f.platform, objective:f.objective, status:f.status,
+        budgetNaira, spentNaira:0, targetLocations:f.targetLocations, startDate:f.startDate||null, endDate:f.endDate||null,
+        impressions:0, clicks:0, conversions:0, roas:0, ctr:0
+      });
+    }
+    persist();
+    campaignSaving = false;
+    campaignModalOpen = false;
+    renderApp();
+    showToast(editingCampaignId ? "Campaign updated" : "Campaign created");
+  }, 400);
+}
+function deleteCampaign(id){
+  DB.campaigns = DB.campaigns.filter(c=>c.id!==id);
+  persist();
+  renderApp();
+  showToast("Campaign deleted");
+}
+function toggleCampaignStatus(id){
+  const c = DB.campaigns.find(x=>x.id===id);
+  if (!c) return;
+  c.status = c.status==="live" ? "paused" : "live";
+  persist();
+  renderApp();
+}
+</script>
+
+<script>
+/* ============================================================
+   ANALYTICS PAGE
+   ============================================================ */
+let analyticsRange = 30;
+let analyticsPlatform = "all";
+
+PageRenderers.analytics = function(){
+  const allSnaps = (DB.analyticsSnapshots||[]).filter(s => {
+    const daysOld = (Date.now() - new Date(s.date).getTime())/(1000*60*60*24);
+    return daysOld <= analyticsRange && (analyticsPlatform==="all" || s.platform===analyticsPlatform);
+  });
+
+  const totals = allSnaps.reduce((acc,s)=>{
+    acc.impressions+=s.impressions; acc.clicks+=s.clicks; acc.spend+=s.spend; acc.conversions+=s.conversions; acc.roasSum+=s.roas; acc.count++;
+    return acc;
+  }, {impressions:0,clicks:0,spend:0,conversions:0,roasSum:0,count:0});
+  const avgROAS = totals.count ? totals.roasSum/totals.count : 0;
+  const avgCTR = totals.impressions ? (totals.clicks/totals.impressions*100) : 0;
+  const cpa = totals.conversions ? totals.spend/totals.conversions : 0;
+
+  const byDate = {};
+  allSnaps.forEach(s => {
+    const k = s.date.slice(0,10);
+    if (!byDate[k]) byDate[k] = {date:k, impressions:0, clicks:0, spend:0, conversions:0};
+    byDate[k].impressions += s.impressions; byDate[k].clicks += s.clicks; byDate[k].spend += s.spend; byDate[k].conversions += s.conversions;
+  });
+  const trendData = Object.values(byDate).sort((a,b)=>a.date.localeCompare(b.date));
+  const spendChart = svgAreaChart(
+    trendData.map(d=>({x:formatDate(d.date,{month:"short",day:"numeric"}), values:{spend:d.spend}})),
+    { id:"spend", series:[{key:"spend",color:"#39c5f4"}], height:220, yFormat:formatNaira }
+  );
+  const convChart = svgAreaChart(
+    trendData.map(d=>({x:formatDate(d.date,{month:"short",day:"numeric"}), values:{conversions:d.conversions}})),
+    { id:"conv", series:[{key:"conversions",color:"#22c97e"}], height:180, yFormat:formatNumber }
+  );
+
+  const byPlatform = {};
+  allSnaps.forEach(s=>{
+    if(!byPlatform[s.platform]) byPlatform[s.platform]={impressions:0,clicks:0,spend:0,conversions:0,roasSum:0,count:0};
+    const r = byPlatform[s.platform];
+    r.impressions+=s.impressions; r.clicks+=s.clicks; r.spend+=s.spend; r.conversions+=s.conversions; r.roasSum+=s.roas; r.count++;
+  });
+  const platformRows = Object.entries(byPlatform).map(([p,d])=>({
+    platform:p, ...d, roas: d.count?d.roasSum/d.count:0, ctr: d.impressions?(d.clicks/d.impressions*100):0
+  })).sort((a,b)=>b.spend-a.spend);
+
+  return `
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
+      <div class="tab-row">
+        ${[7,14,30,90].map(d=>`<button class="tab-btn ${analyticsRange===d?'active':''}" onclick="analyticsRange=${d};renderApp();">${d}D</button>`).join("")}
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;" class="scrollbar-hide">
+        ${["all","meta","google","tiktok","twitter"].map(p=>`<button class="filter-chip ${analyticsPlatform===p?'active':''}" onclick="analyticsPlatform='${p}';renderApp();">${p==="all"?"All Platforms":PLATFORM_LABEL[p]}</button>`).join("")}
+      </div>
+    </div>
+
+    <div class="grid-4">
+      ${statCard("Total Spend", formatNaira(totals.spend), `${analyticsRange}-day total`, "wallet", "wallet", "#39c5f4")}
+      ${statCard("Avg CTR", avgCTR.toFixed(2)+"%", "Click-through rate", "trendUp", "trendUp", "#5b9bf5")}
+      ${statCard("Avg ROAS", avgROAS.toFixed(2)+"x", "Return on ad spend", "trendUp", "barchart", "#22c97e")}
+      ${statCard("Cost / Conversion", formatNaira(cpa), `${formatNumber(totals.conversions)} conversions`, "cart", "cart", "#a78bfa")}
+    </div>
+
+    <div class="card" style="padding:18px;">
+      <h3 style="margin:0 0 2px;font-size:13.5px;font-weight:600;color:#fff;">Spend Over Time</h3>
+      <p style="margin:0 0 14px;font-size:11px;color:var(--ink-600);">${analyticsPlatform==="all"?"All platforms":PLATFORM_LABEL[analyticsPlatform]} · Last ${analyticsRange} days</p>
+      ${spendChart}
+    </div>
+
+    <div class="grid-3" style="grid-template-columns:1fr;">
+      <div class="card" style="padding:18px;">
+        <h3 style="margin:0 0 2px;font-size:13.5px;font-weight:600;color:#fff;">Conversions</h3>
+        <p style="margin:0 0 14px;font-size:11px;color:var(--ink-600);">Daily conversion volume</p>
+        ${convChart}
+      </div>
+      <div class="card" style="padding:18px;">
+        <h3 style="margin:0 0 14px;font-size:13.5px;font-weight:600;color:#fff;">Platform Comparison</h3>
+        <div style="display:flex;justify-content:center;margin-bottom:6px;">
+          ${svgBarChart(platformRows.map(r=>({label:PLATFORM_LABEL[r.platform].split(" ")[0],value:r.roas,color:PLATFORM_COLOR_HEX[r.platform]})), {height:160})}
+        </div>
+        <p style="text-align:center;font-size:10.5px;color:var(--ink-600);margin:4px 0 0;">ROAS by platform</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="padding:18px 18px 0;">
+        <h3 style="margin:0 0 14px;font-size:13.5px;font-weight:600;color:#fff;">Platform Breakdown</h3>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Platform</th><th class="text-right">Impressions</th><th class="text-right">Clicks</th><th class="text-right">CTR</th><th class="text-right">Spend</th><th class="text-right">Conversions</th><th class="text-right">ROAS</th></tr></thead>
+          <tbody>
+            ${platformRows.map(r => `
+              <tr>
+                <td>${platformBadge(r.platform)}</td>
+                <td class="text-right">${formatNumber(r.impressions)}</td>
+                <td class="text-right">${formatNumber(r.clicks)}</td>
+                <td class="text-right">${r.ctr.toFixed(2)}%</td>
+                <td class="text-right">${formatNaira(r.spend)}</td>
+                <td class="text-right">${formatNumber(r.conversions)}</td>
+                <td class="text-right"><span style="font-weight:700;color:${r.roas>=3?'var(--emerald)':r.roas>=2?'var(--amber)':'var(--red)'};">${r.roas.toFixed(2)}x</span></td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+};
+</script>
+
+<script>
+/* ============================================================
+   BUDGET OPTIMIZER PAGE
+   ============================================================ */
+let budgetFormDirty = false;
+let budgetSaving = false;
+
+PageRenderers.budget = function(){
+  const b = DB.budgetAllocation;
+  const total = b.totalBudgetNaira;
+  const platforms = [
+    { key:"metaPercent", label:"Meta", color:PLATFORM_COLOR_HEX.meta, platform:"meta" },
+    { key:"googlePercent", label:"Google", color:PLATFORM_COLOR_HEX.google, platform:"google" },
+    { key:"tiktokPercent", label:"TikTok", color:PLATFORM_COLOR_HEX.tiktok, platform:"tiktok" },
+    { key:"twitterPercent", label:"X (Twitter)", color:PLATFORM_COLOR_HEX.twitter, platform:"twitter" },
+  ];
+  const sumPercent = platforms.reduce((s,p)=>s+b[p.key],0);
+  const byPlatform = getAnalyticsByPlatform();
+
+  const pieData = platforms.map(p => ({ label:p.label, value:b[p.key], color:p.color }));
+
+  return `
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:18px;">
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
+        <div>
+          <h3 style="margin:0;font-size:14px;font-weight:600;color:#fff;">${escapeHtml(b.name)}</h3>
+          <p style="margin:2px 0 0;font-size:11.5px;color:var(--ink-600);">Total monthly budget</p>
+        </div>
+        <p style="margin:0;font-size:24px;font-weight:800;color:var(--cyan-300);">${formatNaira(total)}</p>
+      </div>
+    </div>
+
+    <div class="grid-3" style="grid-template-columns:1fr;">
+      <div class="card" style="padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Allocation by Platform</h3>
+          <span style="font-size:11px;font-weight:600;color:${sumPercent===100?'var(--emerald)':'var(--amber)'};">${sumPercent}% allocated</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          ${platforms.map(p => `
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+                <span style="display:flex;align-items:center;gap:7px;font-size:13px;color:#fff;font-weight:500;">
+                  <span style="width:9px;height:9px;border-radius:50%;background:${p.color};display:inline-block;"></span>${p.label}
+                </span>
+                <span style="font-size:13px;color:var(--ink-300);font-weight:600;">${b[p.key]}% <span style="color:var(--ink-600);font-weight:400;">(${formatNaira(total*b[p.key]/100)})</span></span>
+              </div>
+              <input type="range" min="0" max="100" value="${b[p.key]}" class="range-slider" oninput="updateBudgetSlider('${p.key}', this.value)" />
+            </div>`).join("")}
+        </div>
+        ${sumPercent!==100 ? `<p style="margin:14px 0 0;font-size:11.5px;color:var(--amber);display:flex;align-items:center;gap:6px;">${ic('alertTriangle',13)}Allocations should total 100% (currently ${sumPercent}%)</p>` : ""}
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+          <div>
+            <p style="margin:0;font-size:13px;color:#fff;font-weight:500;">Auto-Optimize</p>
+            <p style="margin:2px 0 0;font-size:11px;color:var(--ink-600);">Let AI rebalance weekly based on ROAS</p>
+          </div>
+          <button class="switch ${b.autoOptimize?'on':''}" onclick="toggleAutoOptimize()"><span class="knob"></span></button>
+        </div>
+
+        <button class="glow-btn" style="width:100%;margin-top:16px;padding:11px;border-radius:11px;font-size:13px;" ${budgetSaving?'disabled':''} onclick="saveBudgetAllocation()">
+          ${budgetSaving ? "Saving..." : "Save Allocation"}
+        </button>
+      </div>
+
+      <div class="card" style="padding:18px;">
+        <h3 style="margin:0 0 14px;font-size:13.5px;font-weight:600;color:#fff;">Budget Distribution</h3>
+        <div style="display:flex;justify-content:center;">${svgPieChart(pieData,{size:150})}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+          ${platforms.map(p => {
+            const perf = byPlatform[p.platform];
+            return `<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:8px 10px;background:rgba(255,255,255,0.025);border-radius:9px;">
+              <span style="color:var(--ink-300);">${p.label}</span>
+              <span style="font-weight:700;color:${perf&&perf.roas>=3?'var(--emerald)':'var(--amber)'};">${perf?perf.roas.toFixed(1)+'x ROAS':'—'}</span>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:18px;background:linear-gradient(135deg,rgba(57,197,244,0.06),transparent);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="color:var(--cyan-400);">${ic('sparkles',16)}</span>
+        <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">AI Optimization Insight</h3>
+      </div>
+      <p style="margin:0;font-size:12.5px;color:var(--ink-400);line-height:1.7;">
+        Based on the last 30 days, <b style="color:#fff;">Google Ads</b> is delivering the strongest ROAS (${(byPlatform.google?.roas||4.2).toFixed(1)}x) relative to spend.
+        Consider shifting 5–10% of your <b style="color:#fff;">TikTok</b> allocation toward Google to potentially increase blended ROAS by an estimated 0.3–0.6x over the next billing cycle.
+      </p>
+    </div>
+  </div>`;
+};
+
+function updateBudgetSlider(key, value){
+  DB.budgetAllocation[key] = parseInt(value,10);
+  renderApp();
+}
+function toggleAutoOptimize(){
+  DB.budgetAllocation.autoOptimize = !DB.budgetAllocation.autoOptimize;
+  persist();
+  renderApp();
+}
+function saveBudgetAllocation(){
+  budgetSaving = true;
+  renderApp();
+  setTimeout(()=>{
+    persist();
+    budgetSaving = false;
+    renderApp();
+    showToast("Budget allocation saved");
+  }, 400);
+}
+</script>
+
+<script>
+/* ============================================================
+   SOCIAL FEED & BOOST PAGE
+   ============================================================ */
+let socialPlatformFilter = "all";
+let boostModalPostId = null;
+let boostForm = { budgetNaira:"5000", days:"7", objective:"engagement" };
+let boostSaving = false;
+
+PageRenderers.social = function(){
+  const posts = (DB.socialPosts||[]).filter(p => socialPlatformFilter==="all" || p.platform===socialPlatformFilter)
+    .sort((a,b)=> new Date(b.publishedAt) - new Date(a.publishedAt));
+
+  return `
+  <div class="fade-in">
+    <div style="display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;" class="scrollbar-hide">
+      ${["all","meta","tiktok","google","twitter"].map(p=>`<button class="filter-chip ${socialPlatformFilter===p?'active':''}" onclick="socialPlatformFilter='${p}';renderApp();">${p==="all"?"All Posts":PLATFORM_LABEL[p]}</button>`).join("")}
+    </div>
+
+    <div class="grid-3">
+      ${posts.map(post => socialPostCard(post)).join("")}
+    </div>
+    ${posts.length===0 ? `<div class="card" style="padding:48px;text-align:center;"><p style="color:var(--ink-600);font-size:13px;margin:0;">No posts for this platform yet</p></div>` : ""}
+  </div>
+
+  ${boostModalPostId ? boostModalHTML() : ""}
+  `;
+};
+
+function socialPostCard(post){
+  const engagementRate = post.reach ? (((post.likes+post.comments+post.shares)/post.reach)*100).toFixed(1) : "0.0";
+  return `
+  <div class="card" style="overflow:hidden;display:flex;flex-direction:column;">
+    ${post.mediaUrl ? `<div style="width:100%;aspect-ratio:1.6;background:var(--navy-800);overflow:hidden;">
+      <img src="${escapeHtml(post.mediaUrl)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.style.display='none'"/>
+    </div>` : `<div style="width:100%;aspect-ratio:1.6;background:linear-gradient(135deg,var(--navy-800),var(--navy-700));display:flex;align-items:center;justify-content:center;color:var(--ink-700);">${ic(post.mediaType==='video'?'play':'message',28)}</div>`}
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1;">
+      <div style="display:flex;align-items:center;justify-content:between;gap:8px;">
+        ${platformBadge(post.platform,"sm")}
+        ${post.isBoosted ? `<span class="pill" style="background:rgba(245,166,35,0.12);color:var(--amber);border-color:rgba(245,166,35,0.25);margin-left:auto;">${ic('zap',10)}Boosted</span>` : ""}
+      </div>
+      <p style="margin:0;font-size:12.5px;color:var(--ink-300);line-height:1.55;" class="line-clamp-2">${escapeHtml(post.content)}</p>
+      <div style="display:flex;gap:14px;font-size:11.5px;color:var(--ink-500);">
+        <span style="display:flex;align-items:center;gap:4px;">${ic('heart',12)}${formatNumber(post.likes)}</span>
+        <span style="display:flex;align-items:center;gap:4px;">${ic('message',12)}${formatNumber(post.comments)}</span>
+        <span style="display:flex;align-items:center;gap:4px;">${ic('share',12)}${formatNumber(post.shares)}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--ink-600);padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">
+        <span>${formatNumber(post.reach)} reach</span>
+        <span>${engagementRate}% engagement</span>
+      </div>
+      ${!post.isBoosted ? `<button class="glow-btn" style="padding:9px;border-radius:9px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px;" onclick="openBoostModal(${post.id})">${ic('zap',13)}Boost This Post</button>`
+      : `<button class="ghost-btn" style="padding:9px;border-radius:9px;font-size:12.5px;" disabled>Currently Boosted</button>`}
+    </div>
+  </div>`;
+}
+
+function boostModalHTML(){
+  const post = DB.socialPosts.find(p=>p.id===boostModalPostId);
+  if (!post) return "";
+  const estimatedReach = Math.round(parseInt(boostForm.budgetNaira||0,10) * 35);
+  return `
+  <div class="modal-overlay" onclick="if(event.target===this){closeBoostModal()}">
+    <div class="modal-box" style="max-width:460px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <h2 style="margin:0;font-size:15px;font-weight:600;color:#fff;display:flex;align-items:center;gap:7px;">${ic('zap',16,'')}<span style="color:var(--amber);"></span>Boost Post</h2>
+        <button onclick="closeBoostModal()" style="background:none;border:none;color:var(--ink-500);">${ic('x',18)}</button>
+      </div>
+      <div style="padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <p style="margin:0;font-size:12.5px;color:var(--ink-400);line-height:1.5;background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;" class="line-clamp-2">${escapeHtml(post.content)}</p>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Daily Budget (₦)</label>
+          <input type="number" value="${boostForm.budgetNaira}" oninput="boostForm.budgetNaira=this.value;renderApp();" />
+        </div>
+        <div class="grid-2">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Duration (days)</label>
+            <select onchange="boostForm.days=this.value">
+              ${[3,7,14,30].map(d=>`<option value="${d}" ${boostForm.days==String(d)?'selected':''}>${d} days</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Objective</label>
+            <select onchange="boostForm.objective=this.value">
+              <option value="engagement" ${boostForm.objective==='engagement'?'selected':''}>Engagement</option>
+              <option value="reach" ${boostForm.objective==='reach'?'selected':''}>Reach</option>
+              <option value="traffic" ${boostForm.objective==='traffic'?'selected':''}>Traffic</option>
+              <option value="conversions" ${boostForm.objective==='conversions'?'selected':''}>Conversions</option>
+            </select>
+          </div>
+        </div>
+        <div style="padding:12px 14px;border-radius:11px;background:rgba(57,197,244,0.08);border:1px solid rgba(57,197,244,0.2);">
+          <p style="margin:0 0 2px;font-size:11px;color:var(--ink-500);">Estimated additional reach</p>
+          <p style="margin:0;font-size:18px;font-weight:700;color:var(--cyan-300);">+${formatNumber(estimatedReach)} people</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding:18px 22px;">
+        <button class="ghost-btn" style="flex:1;padding:11px;border-radius:11px;font-size:13px;" onclick="closeBoostModal()">Cancel</button>
+        <button class="glow-btn" style="flex:1;padding:11px;border-radius:11px;font-size:13px;" ${boostSaving?'disabled':''} onclick="confirmBoostPost()">${boostSaving?"Boosting...":"Boost Now"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function openBoostModal(id){ boostModalPostId=id; boostForm={budgetNaira:"5000",days:"7",objective:"engagement"}; renderApp(); }
+function closeBoostModal(){ boostModalPostId=null; renderApp(); }
+function confirmBoostPost(){
+  boostSaving = true;
+  renderApp();
+  setTimeout(()=>{
+    const post = DB.socialPosts.find(p=>p.id===boostModalPostId);
+    if (post) post.isBoosted = true;
+    persist();
+    boostSaving = false;
+    boostModalPostId = null;
+    renderApp();
+    showToast("Post boosted successfully!");
+  }, 500);
+}
+</script>
+
+<script>
+/* ============================================================
+   AI CREATIVE TOOLS PAGE — ad copy generation (template-based demo)
+   ============================================================ */
+const LANGUAGE_LABEL = { en:"English", pidgin:"Pidgin", yoruba:"Yorùbá", igbo:"Igbo", hausa:"Hausa" };
+
+function adCopyTemplates(productName, platform, language){
+  const p = productName || "this product";
+  const P = productName || "Amazing Deal";
+  const lib = {
+    meta: {
+      en: { headline:`${P} — Shop Now in Nigeria!`, body:`Discover ${p} at unbeatable prices. Fast delivery across Lagos, Abuja, Kano and more. Secure payment via Paystack. Shop today!`, cta:"Shop Now" },
+      pidgin: { headline:`${P} Dey Call Your Name! 🔥`, body:`My people, see the deal wey go make you happy! ${p} dey available now. We go deliver reach your house. No dull yourself!`, cta:"Buy Am Now" },
+      yoruba: { headline:`${P} — Rà Báyìí! 🛍️`, body:`Ẹ wá rà ${p} ní ìdiyèlè tó yẹ. A máa ń fi gbígbé wọ ìlú yín ní ìyára. Ẹ pe wa báyìí!`, cta:"Ra Báyìí" },
+      igbo: { headline:`${P} — Zụọ Ugbu a! 🎉`, body:`Nwee ${p} n'ọnụ ahịa kacha mma. Anyị ebubata ya n'ụlọ gị ngwa ngwa. Kpọọ anyị taa!`, cta:"Zụọ Ugbu a" },
+      hausa: { headline:`${P} — Saya Yanzu! ✨`, body:`Sami ${p} a farashi mai kyau. Muna kawo shi gidanku da sauri ko'ina a Najeriya. Biya cikin aminci ta Paystack!`, cta:"Saya Yanzu" },
+    },
+    google: {
+      en: { headline:`${P} | Fast Nigeria Delivery`, body:`Shop ${p} online. Same-day Lagos delivery, nationwide 48hrs. Paystack secured checkout. 30-day returns.`, cta:"Shop Online" },
+      pidgin: { headline:`${P} | We Deliver Everywhere`, body:`Find ${p} online. Fast delivery for Lagos, Abuja and everywhere for Nigeria. Pay with Paystack - e dey safe!`, cta:"Order Now" },
+      yoruba: { headline:`${P} | Ìfijiṣẹ́ Kíákíá`, body:`Ra ${p} lórí ayélujára. Ìfijiṣẹ́ kíákíá sí Èkó àti gbogbo Nàìjíríà. Ìsanwó tó ní ìdánilójú pẹ̀lú Paystack.`, cta:"Ra Lórí Ayélujára" },
+      igbo: { headline:`${P} | Nzipu Ngwa Ngwa`, body:`Zụọ ${p} n'ịntanetị. Nzipu n'ụbọchị ahụ na Lagos, ụbọchị abụọ na mba niile. Paystack na-eche nche.`, cta:"Zụọ N'ịntanetị" },
+      hausa: { headline:`${P} | Isar da Sauri a Najeriya`, body:`Saya ${p} akan layi. Isar da rana ɗaya a Lagos, kasa baki ɗaya cikin sa'o'i 48. Tsaro ta Paystack.`, cta:"Saya Akan Layi" },
+    },
+    tiktok: {
+      en: { headline:`Wait till you see our ${p} 😱`, body:`POV: You just found Nigeria's best deal on ${p}. Fast delivery, real quality, prices that make sense. Drop a 🛒 if you want one!`, cta:"Order Now" },
+      pidgin: { headline:`This ${p} go make you say wow! 😮`, body:`Naija people listen up! We get the best ${p} for you. Wetin you dey wait for? Price dey affordable, delivery dey fast. Comment "send me" below!`, cta:"Buy Am" },
+      yoruba: { headline:`Ẹ wo ${p} yìí, ẹ máa yà! 😮`, body:`Ará ilú, ẹ wá wo ọjà tó dára jùlọ! ${p} ti dé. Iye rẹ̀ rọrùn, ìfijiṣẹ́ kíákíá. Sọ "rán mi" ní abẹ́!`, cta:"Ra Báyìí" },
+      hausa: { headline:`Ku jira ku ga ${p} 😱`, body:`POV: Ka samo mafi kyawun kaya a Najeriya — ${p}. Isar da sauri, ingancin gaske, farashi mai dacewa. Rubuta "aiko mini" a ƙasa!`, cta:"Yi Oda Yanzu" },
+    },
+    twitter: {
+      en: { headline:`${P} — Now in Nigeria 🇳🇬`, body:`Thread 🧵: Why thousands of Nigerians trust us for ${p}. Fast delivery. Paystack payment. Real reviews. Shop now 👇`, cta:"Learn More" },
+      pidgin: { headline:`${P} don land Nigeria! 🇳🇬`, body:`Omo see the thing wey don reach! ${p} don land and e dey available. No waste time, order now before e finish. RT if you see am!`, cta:"Order Now" },
+      hausa: { headline:`${P} ya zo Najeriya yanzu 🇳🇬`, body:`Dubban Najeriya sun amince da mu don ${p}. Isar da sauri. Biyan kuɗi ta Paystack. Saya yanzu 👇`, cta:"Koyi Ƙari" },
+    },
+  };
+  const platformTpl = lib[platform] || lib.meta;
+  return platformTpl[language] || platformTpl.en;
+}
+
+let aiToolForm = { productName:"", platform:"meta", language:"en", campaignId:"" };
+let aiToolGenerating = false;
+let aiToolResult = null;
+let aiCopyTab = "generate";
+
+PageRenderers["ai-tools"] = function(){
+  const savedCopies = (DB.adCopies||[]).slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  return `
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:18px;">
+    <div class="tab-row">
+      <button class="tab-btn ${aiCopyTab==='generate'?'active':''}" onclick="aiCopyTab='generate';renderApp();">Generate New</button>
+      <button class="tab-btn ${aiCopyTab==='library'?'active':''}" onclick="aiCopyTab='library';renderApp();">Saved Copy (${savedCopies.length})</button>
+    </div>
+
+    ${aiCopyTab==='generate' ? `
+    <div class="grid-3" style="grid-template-columns:1fr;">
+      <div class="card" style="padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="color:var(--cyan-400);">${ic('sparkles',16)}</span>
+          <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Generate Ad Copy</h3>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Product / Service Name</label>
+            <input type="text" value="${escapeHtml(aiToolForm.productName)}" placeholder="e.g., Wireless Earbuds, Hair Cream..." oninput="aiToolForm.productName=this.value" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Platform</label>
+            <select onchange="aiToolForm.platform=this.value;renderApp();">
+              <option value="meta" ${aiToolForm.platform==='meta'?'selected':''}>Meta (Facebook/Instagram)</option>
+              <option value="google" ${aiToolForm.platform==='google'?'selected':''}>Google Ads</option>
+              <option value="tiktok" ${aiToolForm.platform==='tiktok'?'selected':''}>TikTok</option>
+              <option value="twitter" ${aiToolForm.platform==='twitter'?'selected':''}>X (Twitter)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:8px;">Language</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              ${Object.keys(LANGUAGE_LABEL).filter(l => !!adCopyTemplatesAvailable(aiToolForm.platform, l)).map(l => `
+                <button class="filter-chip ${aiToolForm.language===l?'active':''}" onclick="aiToolForm.language='${l}';renderApp();">${LANGUAGE_LABEL[l]}</button>`).join("")}
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Link to Campaign (optional)</label>
+            <select onchange="aiToolForm.campaignId=this.value">
+              <option value="">No campaign</option>
+              ${(DB.campaigns||[]).map(c=>`<option value="${c.id}" ${aiToolForm.campaignId==String(c.id)?'selected':''}>${escapeHtml(c.name)}</option>`).join("")}
+            </select>
+          </div>
+          <button class="glow-btn" style="padding:12px;border-radius:11px;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:7px;" ${aiToolGenerating?'disabled':''} onclick="generateAdCopy()">
+            ${aiToolGenerating ? `<span class="spin" style="display:inline-flex;">${ic('refresh',14)}</span>Generating...` : `${ic('sparkles',14)}Generate Ad Copy`}
+          </button>
+        </div>
+      </div>
+
+      ${aiToolResult ? `
+      <div class="card fade-in" style="padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Generated Copy</h3>
+          <div style="display:flex;gap:6px;">${platformBadge(aiToolResult.platform,"sm")}<span class="pill" style="background:rgba(255,255,255,0.06);color:var(--ink-300);">${LANGUAGE_LABEL[aiToolResult.language]}</span></div>
+        </div>
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <p style="margin:0;font-size:14.5px;font-weight:700;color:#fff;line-height:1.4;">${escapeHtml(aiToolResult.headline)}</p>
+          <p style="margin:0;font-size:13px;color:var(--ink-300);line-height:1.6;">${escapeHtml(aiToolResult.body)}</p>
+          <span class="pill" style="background:rgba(57,197,244,0.15);color:var(--cyan-300);width:fit-content;margin-top:4px;">${escapeHtml(aiToolResult.cta)}</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="ghost-btn" style="flex:1;padding:10px;border-radius:10px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px;" onclick="copyAdCopyToClipboard()">${ic('copy',13)}Copy Text</button>
+          <button class="glow-btn" style="flex:1;padding:10px;border-radius:10px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px;" onclick="saveAdCopy()">${ic('save',13)}Save to Library</button>
+        </div>
+      </div>` : `
+      <div class="card" style="padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px;">
+        <span style="color:var(--ink-700);margin-bottom:10px;">${ic('sparkles',28)}</span>
+        <p style="margin:0;font-size:12.5px;color:var(--ink-600);">Fill the form and generate to preview your localized ad copy here</p>
+      </div>`}
+    </div>` : `
+    <div class="grid-3">
+      ${savedCopies.length===0 ? `<div class="card" style="padding:40px;text-align:center;grid-column:1/-1;"><p style="color:var(--ink-600);font-size:13px;margin:0;">No saved ad copy yet. Generate some on the other tab!</p></div>` :
+      savedCopies.map(copy => `
+        <div class="card" style="padding:16px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            ${platformBadge(copy.platform,"sm")}
+            <span class="pill" style="background:rgba(255,255,255,0.06);color:var(--ink-300);">${LANGUAGE_LABEL[copy.language]||copy.language}</span>
+            ${copy.isApproved ? `<span class="pill status-live" style="margin-left:auto;">${ic('check',10)}Approved</span>` : `<span class="pill status-draft" style="margin-left:auto;">Pending</span>`}
+          </div>
+          <p style="margin:0 0 6px;font-size:13.5px;font-weight:700;color:#fff;line-height:1.35;">${escapeHtml(copy.headline)}</p>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--ink-400);line-height:1.55;" class="line-clamp-2">${escapeHtml(copy.body)}</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="pill" style="background:rgba(57,197,244,0.1);color:var(--cyan-300);font-size:10.5px;">${escapeHtml(copy.cta)}</span>
+            ${!copy.isApproved ? `<button onclick="approveAdCopy(${copy.id})" style="background:none;border:none;color:var(--cyan-400);font-size:11px;font-weight:500;">Approve</button>` : ""}
+          </div>
+        </div>`).join("")}
+    </div>`}
+  </div>`;
+};
+
+function adCopyTemplatesAvailable(platform, language){
+  const lib = { meta:["en","pidgin","yoruba","igbo","hausa"], google:["en","pidgin","yoruba","igbo","hausa"], tiktok:["en","pidgin","yoruba","hausa"], twitter:["en","pidgin","hausa"] };
+  return (lib[platform]||lib.meta).includes(language);
+}
+
+function generateAdCopy(){
+  if (!adCopyTemplatesAvailable(aiToolForm.platform, aiToolForm.language)) aiToolForm.language = "en";
+  aiToolGenerating = true;
+  renderApp();
+  setTimeout(()=>{
+    const tpl = adCopyTemplates(aiToolForm.productName, aiToolForm.platform, aiToolForm.language);
+    aiToolResult = { ...tpl, platform:aiToolForm.platform, language:aiToolForm.language, campaignId: aiToolForm.campaignId ? parseInt(aiToolForm.campaignId,10) : null };
+    aiToolGenerating = false;
+    renderApp();
+  }, 700);
+}
+function copyAdCopyToClipboard(){
+  if (!aiToolResult) return;
+  const text = `${aiToolResult.headline}\n\n${aiToolResult.body}\n\n${aiToolResult.cta}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(()=>showToast("Copied to clipboard")).catch(()=>showToast("Couldn't copy — select text manually"));
+}
+function saveAdCopy(){
+  if (!aiToolResult) return;
+  DB.adCopies.unshift({ id: DB.nextAdCopyId++, ...aiToolResult, isApproved:false, createdAt:new Date().toISOString() });
+  persist();
+  aiToolResult = null;
+  renderApp();
+  showToast("Saved to ad copy library");
+}
+function approveAdCopy(id){
+  const copy = DB.adCopies.find(c=>c.id===id);
+  if (copy) copy.isApproved = true;
+  persist();
+  renderApp();
+  showToast("Ad copy approved");
+}
+</script>
+
+<script>
+/* ============================================================
+   GEO TARGETING PAGE — Nigeria heatmap
+   ============================================================ */
+let geoMetric = "impressions";
+let geoSelectedState = null;
+
+PageRenderers.geo = function(){
+  const data = (DB.geoHeatmap||[]).slice().sort((a,b)=>b[geoMetric]-a[geoMetric]);
+  const maxVal = Math.max(...data.map(d=>d[geoMetric]), 1);
+  const totalSpend = data.reduce((s,d)=>s+d.spend,0);
+  const totalConv = data.reduce((s,d)=>s+d.conversions,0);
+
+  return `
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:18px;">
+    <div class="grid-4">
+      ${statCard("States Covered", data.length, "Active targeting zones", "mappin", "mappin", "#39c5f4")}
+      ${statCard("Total Spend", formatNaira(totalSpend), "Across all states", "wallet", "wallet", "#5b9bf5")}
+      ${statCard("Conversions", formatNumber(totalConv), "Nationwide", "cart", "cart", "#22c97e")}
+      ${statCard("Top State", data[0]?.state||"—", `${formatNumber(data[0]?.impressions||0)} impressions`, "trendUp", "trendUp", "#a78bfa")}
+    </div>
+
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Performance by State</h3>
+        <div class="tab-row">
+          ${["impressions","clicks","conversions","spend"].map(m => `<button class="tab-btn ${geoMetric===m?'active':''}" onclick="geoMetric='${m}';renderApp();">${m.charAt(0).toUpperCase()+m.slice(1)}</button>`).join("")}
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${data.map(d => {
+          const pct = (d[geoMetric]/maxVal)*100;
+          const val = geoMetric==="spend" ? formatNaira(d[geoMetric]) : formatNumber(d[geoMetric]);
+          return `
+          <div onclick="geoSelectedState='${d.state}';renderApp();" style="cursor:pointer;padding:10px 12px;border-radius:11px;background:${geoSelectedState===d.state?'rgba(57,197,244,0.08)':'rgba(255,255,255,0.02)'};border:1px solid ${geoSelectedState===d.state?'rgba(57,197,244,0.25)':'rgba(255,255,255,0.04)'};">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:13px;font-weight:500;color:#fff;">${d.state}</span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--cyan-300);">${val}</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.05);border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--cyan-500),var(--cyan-300));border-radius:99px;"></div>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    ${geoSelectedState ? (()=>{
+      const d = data.find(x=>x.state===geoSelectedState);
+      if (!d) return "";
+      const ctr = d.impressions ? (d.clicks/d.impressions*100) : 0;
+      const cpa = d.conversions ? d.spend/d.conversions : 0;
+      return `
+      <div class="card fade-in" style="padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="margin:0;font-size:14px;font-weight:600;color:#fff;display:flex;align-items:center;gap:7px;">${ic('mappin',15,'')}${d.state} Breakdown</h3>
+          <button onclick="geoSelectedState=null;renderApp();" style="background:none;border:none;color:var(--ink-600);">${ic('x',16)}</button>
+        </div>
+        <div class="grid-4">
+          ${statCard("Impressions", formatNumber(d.impressions), "", "eye", "eye", "#39c5f4")}
+          ${statCard("Clicks", formatNumber(d.clicks), ctr.toFixed(2)+"% CTR", "trendUp", "trendUp", "#5b9bf5")}
+          ${statCard("Conversions", formatNumber(d.conversions), "", "cart", "cart", "#22c97e")}
+          ${statCard("Cost/Conv.", formatNaira(cpa), formatNaira(d.spend)+" spent", "wallet", "wallet", "#a78bfa")}
+        </div>
+      </div>`;
+    })() : ""}
+
+    <div class="card" style="padding:18px;background:linear-gradient(135deg,rgba(57,197,244,0.06),transparent);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="color:var(--cyan-400);">${ic('sparkles',16)}</span>
+        <h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Geo Insight</h3>
+      </div>
+      <p style="margin:0;font-size:12.5px;color:var(--ink-400);line-height:1.7;">
+        <b style="color:#fff;">${data[0]?.state}</b> and <b style="color:#fff;">${data[1]?.state}</b> drive the majority of your impressions, but lower-competition states like
+        <b style="color:#fff;">${data[data.length-3]?.state}</b> and <b style="color:#fff;">${data[data.length-2]?.state}</b> often carry lower CPMs — consider testing a small budget expansion there.
+      </p>
+    </div>
+  </div>`;
+};
+</script>
+
+<script>
+/* ============================================================
+   SETTINGS PAGE
+   ============================================================ */
+let settingsTab = "profile";
+let settingsProfileForm = null;
+let settingsSaving = false;
+let notifPrefs = { campaignAlerts:true, budgetWarnings:true, weeklyReports:true, aiRecommendations:false };
+
+PageRenderers.settings = function(){
+  if (!settingsProfileForm) settingsProfileForm = { ...DB.user };
+  const tabs = [["profile","Profile"],["platforms","Connected Platforms"],["notifications","Notifications"],["billing","Billing"],["app","Install App"]];
+
+  return `
+  <div class="fade-in">
+    <div class="tab-row" style="margin-bottom:18px;">
+      ${tabs.map(([key,label]) => `<button class="tab-btn ${settingsTab===key?'active':''}" onclick="settingsTab='${key}';renderApp();">${label}</button>`).join("")}
+    </div>
+
+    ${settingsTab==='profile' ? settingsProfileTab() : ""}
+    ${settingsTab==='platforms' ? settingsPlatformsTab() : ""}
+    ${settingsTab==='notifications' ? settingsNotificationsTab() : ""}
+    ${settingsTab==='billing' ? settingsBillingTab() : ""}
+    ${settingsTab==='app' ? settingsInstallTab() : ""}
+  </div>`;
+};
+
+function settingsProfileTab(){
+  const f = settingsProfileForm;
+  return `
+  <div class="card" style="padding:20px;max-width:520px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--cyan-500),var(--navy-600));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;">${(f.name||"U").charAt(0)}</div>
+      <div>
+        <p style="margin:0;font-size:15px;font-weight:600;color:#fff;">${escapeHtml(f.name)}</p>
+        <p style="margin:2px 0 0;font-size:12px;color:var(--ink-600);">${escapeHtml(f.email)}</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Full Name</label>
+        <input type="text" value="${escapeHtml(f.name)}" oninput="settingsProfileForm.name=this.value" />
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Business Name</label>
+        <input type="text" value="${escapeHtml(f.businessName||'')}" oninput="settingsProfileForm.businessName=this.value" />
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Email Address</label>
+        <input type="email" value="${escapeHtml(f.email)}" oninput="settingsProfileForm.email=this.value" />
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Phone Number</label>
+        <input type="text" value="${escapeHtml(f.phone||'')}" oninput="settingsProfileForm.phone=this.value" />
+      </div>
+      <div class="grid-2">
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Country</label>
+          <input type="text" value="${escapeHtml(f.country||'Nigeria')}" disabled style="opacity:0.6;" />
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--ink-400);margin-bottom:6px;">Currency</label>
+          <input type="text" value="₦ NGN — Naira" disabled style="opacity:0.6;" />
+        </div>
+      </div>
+      <button class="glow-btn" style="padding:11px;border-radius:11px;font-size:13px;margin-top:6px;" ${settingsSaving?'disabled':''} onclick="saveProfile()">${settingsSaving?"Saving...":"Save Changes"}</button>
+    </div>
+  </div>`;
+}
+
+function settingsPlatformsTab(){
+  const conns = DB.platformConnections||[];
+  return `
+  <div class="grid-2" style="grid-template-columns:1fr;max-width:560px;">
+    ${conns.map(c => `
+      <div class="card" style="padding:16px;display:flex;align-items:center;gap:14px;">
+        <div style="width:42px;height:42px;border-radius:11px;background:${PLATFORM_COLOR_HEX[c.platform]}22;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:${PLATFORM_COLOR_HEX[c.platform]};flex-shrink:0;">${PLATFORM_ICON_LETTER[c.platform]}</div>
+        <div style="flex:1;min-width:0;">
+          <p style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">${PLATFORM_LABEL[c.platform]}</p>
+          <p style="margin:2px 0 0;font-size:11.5px;color:var(--ink-600);" class="truncate">${c.isConnected ? escapeHtml(c.accountName) : "Not connected"}</p>
+        </div>
+        <button class="${c.isConnected?'ghost-btn':'glow-btn'}" style="padding:8px 14px;border-radius:9px;font-size:12px;white-space:nowrap;flex-shrink:0;" onclick="togglePlatformConnection('${c.platform}')">
+          ${c.isConnected ? "Disconnect" : "Connect"}
+        </button>
+      </div>`).join("")}
+  </div>`;
+}
+
+function settingsNotificationsTab(){
+  const items = [
+    ["campaignAlerts","Campaign Alerts","Get notified when a campaign starts, pauses, or ends"],
+    ["budgetWarnings","Budget Warnings","Alerts when a campaign is close to exhausting its budget"],
+    ["weeklyReports","Weekly Performance Reports","A summary email every Monday with key metrics"],
+    ["aiRecommendations","AI Recommendation Alerts","Notify when new AI optimization suggestions are ready"],
+  ];
+  return `
+  <div class="card" style="padding:8px;max-width:560px;">
+    ${items.map(([key,title,desc],i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;${i<items.length-1?'border-bottom:1px solid rgba(255,255,255,0.05);':''}">
+        <div style="min-width:0;">
+          <p style="margin:0;font-size:13px;font-weight:500;color:#fff;">${title}</p>
+          <p style="margin:3px 0 0;font-size:11.5px;color:var(--ink-600);line-height:1.4;">${desc}</p>
+        </div>
+        <button class="switch ${notifPrefs[key]?'on':''}" onclick="notifPrefs.${key}=!notifPrefs.${key};renderApp();"><span class="knob"></span></button>
+      </div>`).join("")}
+  </div>`;
+}
+
+function settingsBillingTab(){
+  return `
+  <div class="grid-2" style="grid-template-columns:1fr;max-width:560px;">
+    <div class="card" style="padding:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        ${ic('card',16,'')}<h3 style="margin:0;font-size:13.5px;font-weight:600;color:#fff;">Payment Method</h3>
+      </div>
+      <p style="margin:0 0 14px;font-size:11.5px;color:var(--ink-600);">Billed in Naira via Paystack</p>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(255,255,255,0.025);border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+        <div style="width:38px;height:26px;border-radius:5px;background:linear-gradient(135deg,#1c2c4d,#27406b);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--cyan-300);">VISA</div>
+        <div>
+          <p style="margin:0;font-size:13px;color:#fff;font-weight:500;">•••• •••• •••• 4242</p>
+          <p style="margin:1px 0 0;font-size:11px;color:var(--ink-600);">Expires 09/28</p>
+        </div>
+        <button class="ghost-btn" style="margin-left:auto;padding:7px 12px;border-radius:8px;font-size:11.5px;">Update</button>
+      </div>
+    </div>
+    <div class="card" style="padding:18px;">
+      <h3 style="margin:0 0 14px;font-size:13.5px;font-weight:600;color:#fff;">Recent Invoices</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${[0,1,2].map(i => `
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12.5px;padding:10px 0;${i<2?'border-bottom:1px solid rgba(255,255,255,0.05);':''}">
+            <span style="color:var(--ink-400);">${formatDate(daysAgo(i*30),{month:"long",year:"numeric"})}</span>
+            <span style="color:#fff;font-weight:500;">${formatNaira(245000+i*15000)}</span>
+            <span class="pill status-live">Paid</span>
+          </div>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function settingsInstallTab(){
+  return `
+  <div class="card" style="padding:24px;max-width:520px;text-align:center;">
+    <div style="display:flex;justify-content:center;margin-bottom:16px;">${logoMarkSVG(56)}</div>
+    <h3 style="margin:0 0 6px;font-size:16px;font-weight:700;color:#fff;">Install Dozzaa on your phone</h3>
+    <p style="margin:0 0 20px;font-size:12.5px;color:var(--ink-500);line-height:1.6;">Add Dozzaa to your home screen for a full-screen, app-like experience — works offline once installed.</p>
+    <button class="glow-btn" id="settings-install-btn" style="padding:12px 24px;border-radius:12px;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;" onclick="triggerInstallPrompt()">${ic('download',15)}Install App</button>
+    <div style="text-align:left;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+      <p style="margin:0 0 10px;font-size:11.5px;font-weight:600;color:var(--ink-400);">On Android (Chrome)</p>
+      <p style="margin:0 0 16px;font-size:12px;color:var(--ink-600);line-height:1.7;">Tap the ⋮ menu → "Install app" or "Add to Home screen", then confirm.</p>
+      <p style="margin:0 0 10px;font-size:11.5px;font-weight:600;color:var(--ink-400);">On iPhone (Safari)</p>
+      <p style="margin:0;font-size:12px;color:var(--ink-600);line-height:1.7;">Tap the Share icon → "Add to Home Screen", then confirm.</p>
+    </div>
+  </div>`;
+}
+
+function saveProfile(){
+  settingsSaving = true;
+  renderApp();
+  setTimeout(()=>{
+    DB.user = { ...DB.user, ...settingsProfileForm };
+    persist();
+    settingsSaving = false;
+    renderApp();
+    showToast("Profile updated");
+  }, 400);
+}
+function togglePlatformConnection(platform){
+  const c = DB.platformConnections.find(x=>x.platform===platform);
+  if (!c) return;
+  c.isConnected = !c.isConnected;
+  c.lastSyncAt = c.isConnected ? new Date().toISOString() : null;
+  persist();
+  renderApp();
+  showToast(c.isConnected ? `${PLATFORM_LABEL[platform]} connected` : `${PLATFORM_LABEL[platform]} disconnected`);
+}
+</script>
+
+<script>
+/* ============================================================
+   PWA INSTALL PROMPT
+   ============================================================ */
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+function triggerInstallPrompt(){
+  if (deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choice) => {
+      if (choice.outcome === "accepted") showToast("Installing Dozzaa...");
+      deferredInstallPrompt = null;
+    });
+  } else {
+    showToast("Use your browser menu → 'Add to Home screen' to install");
+  }
+}
+window.addEventListener("appinstalled", () => { showToast("Dozzaa installed!"); });
+</script>
+
+<script>
+bootDozzaa();
+</script>
+
+</body>
+</html>
